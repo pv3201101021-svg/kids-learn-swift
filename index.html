@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduSpark - 每日學習</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { nunito: ['Nunito','sans-serif'] },
+          colors: {
+            'duo-green':'#58CC02','duo-green-dark':'#46a302','duo-green-light':'#7ed321',
+            'duo-orange':'#FF9600','duo-orange-dark':'#e08600',
+            'duo-red':'#FF4B4B','duo-red-dark':'#ea2b2b',
+            'duo-blue':'#1CB0F6','duo-blue-dark':'#1899d6',
+            'duo-purple':'#CE82FF','duo-gold':'#FFC800',
+            'duo-gray':'#E5E5E5','duo-gray-dark':'#AFAFAF',
+            'duo-bg':'#ECF8FF','duo-card':'#FFFFFF','duo-surface':'#F5FAFF',
+            'text-primary':'#131F24','text-secondary':'#6B7C8A',
+          },
+          borderRadius: { 'duo':'16px','duo-lg':'24px' },
+          boxShadow: {
+            'duo-green':'0 4px 0 #46a302','duo-orange':'0 4px 0 #e08600',
+            'duo-red':'0 4px 0 #ea2b2b','duo-blue':'0 4px 0 #1899d6',
+            'duo-card':'0 2px 8px rgba(0,0,0,0.08)','duo-card-hover':'0 4px 16px rgba(0,0,0,0.12)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Duolingo Math 明亮風格 */
+    body { font-family:'Nunito',sans-serif; background:#ECF8FF; color:#131F24; overflow-x:hidden; }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#ECF8FF; }
+    ::-webkit-scrollbar-thumb { background:#1CB0F6; border-radius:3px; }
+    /* KaTeX 數學公式增強樣式 */
+    .katex { font-size:1.15em!important; color:#131F24!important; }
+    .katex .mord { color:#131F24!important; }
+    .katex .mbin { color:#131F24!important; }
+    .katex .mop { color:#1CB0F6!important; }
+    .katex .mrel { color:#FF9600!important; }
+    .katex .mopen, .katex .mclose { color:#6B7C8A!important; }
+    .katex-display { margin:1em 0!important; }
+    .katex-display .katex-math-block { overflow-x:auto; padding:0.5em 0; }
+    .katex-math-block { display:inline-block; }
+    .math-display { background:#f8f9fa; border-radius:12px; padding:16px 24px; margin:12px 0; text-align:center; overflow-x:auto; }
+    .math-inline { background:#fffbeb; border-radius:6px; padding:2px 6px; }
+    .katex-error { color:#FF4B4B; background:#ffeaea; padding:8px 12px; border-radius:8px; font-size:0.9em; }
+    .katex-error-inline { color:#FF4B4B; border-bottom:2px dashed #FF4B4B; }
+    /* 確保題目和選項中的數學公式正確顯示 */
+    .math-q .katex, .math-opt .katex, .math-hint .katex { font-size:1.1em!important; }
+    .solution-content { line-height:1.8; }
+    .hint-text { line-height:1.7; }
+    .hint-content { max-height:0; overflow:hidden; transition:max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease; opacity:0; padding-top:0; padding-bottom:0; }
+    .hint-content.show { max-height:200px; opacity:1; padding-top:0.75rem; padding-bottom:0.75rem; }
+    .feedback-bar { transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+    .feedback-bar.show { transform:translateY(0); }
+    .choice-btn { transition:all 0.15s ease; }
+    .choice-btn:hover:not(:disabled) { transform:translateY(-2px); }
+    .choice-btn:active:not(:disabled) { transform:translateY(1px); }
+    .subject-btn { transition:all 0.15s ease; }
+    .subject-btn:hover { transform:scale(1.06); }
+    .subject-btn:active { transform:scale(0.96) translateY(2px); box-shadow:none!important; }
+    .page-enter { animation:fadeInUp 0.35s ease forwards; }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+    .streak-fire { animation:pulse 1.5s ease infinite; }
+    .progress-fill { transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes circleProgress { from{stroke-dashoffset:314} }
+    /* Duolingo Math 卡片風格 */
+    .card-bg { background:#fff; }
+    .text-primary { color:#131F24; }
+    .text-secondary { color:#6B7C8A; }
+    .border-card { border:2px solid #E5E5E5; }
+    .correct-btn { background:#58CC02!important; color:#fff!important; }
+    .wrong-btn { background:#FF4B4B!important; color:#fff!important; }
+    .math-icon-bg { background:linear-gradient(135deg,#1CB0F6 0%,#58CC02 100%); }
+  /* 選項按鈕選中狀態 */
+  .choice-btn.selected-correct { background:#58CC02!important; color:#fff!important; border-color:#46a302!important; }
+  .choice-btn.selected-wrong { background:#FF4B4B!important; color:#fff!important; border-color:#ea2b2b!important; }
+  /* 題目卡片增強陰影 */
+  .question-card-shadow { box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+
+  /* ============================================================
+     深色模式 (Dark Mode) 樣式
+     ============================================================ */
+  .dark-mode {
+    --bg-primary:#1a1a2e;
+    --bg-secondary:#16213e;
+    --bg-card:#1e2a47;
+    --bg-surface:#253354;
+    --text-primary:#e8eaf6;
+    --text-secondary:#9fa8bc;
+    --border-color:#2d3a5c;
+  }
+  
+  .dark-mode body,
+  .dark-mode {
+    background:var(--bg-primary)!important;
+    color:var(--text-primary)!important;
+  }
+  
+  .dark-mode ::-webkit-scrollbar-track { background:var(--bg-primary)!important; }
+  .dark-mode ::-webkit-scrollbar-thumb { background:#4a5578!important; }
+  
+  .dark-mode .katex { color:var(--text-primary)!important; }
+  .dark-mode .katex .mord { color:var(--text-primary)!important; }
+  .dark-mode .katex .mbin { color:var(--text-primary)!important; }
+  
+  .dark-mode .min-h-screen.bg-gradient-to-br.from-gray-50.to-gray-100,
+  .dark-mode .min-h-screen {
+    background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)!important;
+  }
+  .dark-mode .bg-white { background:var(--bg-card)!important; }
+  .dark-mode .shadow-xl { box-shadow:0 10px 40px rgba(0,0,0,0.3)!important; }
+  .dark-mode .shadow-lg { box-shadow:0 8px 24px rgba(0,0,0,0.3)!important; }
+  .dark-mode .shadow-md { box-shadow:0 4px 12px rgba(0,0,0,0.2)!important; }
+  .dark-mode .text-gray-800 { color:var(--text-primary)!important; }
+  .dark-mode .text-gray-700 { color:var(--text-primary)!important; }
+  .dark-mode .text-gray-600 { color:var(--text-secondary)!important; }
+  .dark-mode .text-gray-500 { color:var(--text-secondary)!important; }
+  .dark-mode .text-gray-400 { color:var(--text-secondary)!important; }
+  .dark-mode .border-gray-100 { border-color:var(--border-color)!important; }
+  .dark-mode .border-gray-200 { border-color:var(--border-color)!important; }
+  .dark-mode .bg-gray-50 { background:var(--bg-surface)!important; }
+  .dark-mode .bg-gray-100 { background:var(--bg-surface)!important; }
+  .dark-mode .bg-gradient-to-r.from-green-400.to-emerald-500 { 
+    background:linear-gradient(to right,#2d6a4f,#1e8449)!important; 
+  }
+  .dark-mode .from-orange-400 { --tw-from-opacity:1; --tw-from:#d97706; }
+  .dark-mode .to-red-500 { --tw-to-opacity:1; --tw-to:#b91c1c; }
+  .dark-mode .from-blue-400 { --tw-from-opacity:1; --tw-from:#2563eb; }
+  .dark-mode .to-indigo-500 { --tw-to-opacity:1; --tw-to:#4338ca; }
+  .dark-mode input[type="text"] { 
+    background:var(--bg-surface)!important; 
+    color:var(--text-primary)!important; 
+    border-color:var(--border-color)!important;
+  }
+  .dark-mode input::placeholder { color:var(--text-secondary)!important; }
+  .dark-mode .hint-content { background:rgba(28,45,84,0.95)!important; }
+  .dark-mode .feedback-bar { background:#2d6a4f!important; }
+  .dark-mode .correct-btn { background:#2d6a4f!important; }
+  .dark-mode .wrong-btn { background:#991b1b!important; }
+  .dark-mode .math-display { background:#253354!important; }
+  .dark-mode .katex-error { background:rgba(153,27,27,0.3)!important; }
+  
+  /* 深色模式切換按鈕 */
+  .theme-toggle {
+    cursor:pointer;
+    transition:all 0.3s ease;
+  }
+  .theme-toggle:hover {
+    transform:rotate(15deg) scale(1.1);
+  }
+  .theme-toggle:active {
+    transform:scale(0.95);
+  }
+  /* 記憶技巧卡片樣式 */
+  .memory-card {
+    transition:all 0.3s ease;
+  }
+  .memory-card:hover {
+    transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(0,0,0,0.12);
+  }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ============================================================
+// 中文科數據 - 400 條古詩文名句 (來自 c.txt)
+// ============================================================
+const CHINESE_QUOTES = [
+"靡不有初，鮮克有終","投我以桃，報之以李","他山之石，可以攻玉",
+"昔我往矣，楊柳依依，今我來思，雨雪霏霏","戰戰兢兢，如臨深淵，如履薄冰",
+"高山仰止，景行行止","嚶其鳴矣，求其友聲","如切如磋，如琢如磨",
+"投我以木瓜，報之以瓊琚","關關雎鳩，在河之洲。窈窕淑女，君子好逑",
+"風雨如晦，雞鳴不已","人而無儀，不死何為","所謂伊人，在水一方",
+"一日不見，如三秋兮","路漫漫其修遠兮，吾將上下而求索",
+"惟草木之零落兮，恐美人之遲暮","長太息以掩涕兮，哀民生之多艱",
+"亦余心之所善兮，雖九死其猶未悔","與天地兮比壽，與日月兮齊光",
+"吾不能變心而從俗兮，固將愁苦而終窮","身既死兮神以靈，魂魄毅兮為鬼雄",
+"世人皆濁我獨清，眾人皆醉我獨醒","鳥飛返故鄉兮，狐死必首丘",
+"尺有所短，寸有所長","其曲彌高，其和彌寡","滿招損，謙受益",
+"輔車相依，唇亡齒寒","欲加之罪，何患無辭",
+"居安思危，思則有備，有備無患","外舉不棄仇，內舉不失親",
+"人心之不同，如其面焉","人誰無過，過而能改，善莫大焉",
+"多行不義必自斃","防民之口，甚於防川","前事之不忘，後事之師",
+"士為知己者死，女為悅己者容","亡羊而補牢，猶未遲也",
+"日中則移，月滿則虧，物盛則衰","鷸蚌相爭，漁翁得利","知己知彼，百戰不殆",
+"功成而弗居，夫唯弗居，是以不去","見素抱樸，少私寡欲","曲則全，枉則直",
+"知人者智，自知者明","大方無隅，大器晚成，大音希聲，大象無形",
+"知足不辱，知止不殆","大直若屈，大巧若拙",
+"禍兮福之所倚，福兮禍之所伏","千里之行，始於足下","天網恢恢，疏而不漏",
+"民不畏死，奈何以死懼之","信言不美，美言不信","物以類聚，人以群分",
+"仁者見之謂之仁，智者見之謂之智",
+"天行健，君子以自強不息。地勢坤，君子以厚德載物",
+"與朋友交，言而有信","敏於事而慎於言，就有道而正焉",
+"不患人之不己知，患不知人也","學而不思則罔，思而不學則殆",
+"溫故而知新，可以為師矣","君子周而不比，小人比而不周",
+"敏而好學，不恥下問","知之者不如好之者，好之者不知樂之者",
+"知者樂水，仁者樂山","學而不厭，誨人不倦",
+"君子坦蕩蕩，小人長戚戚","不憤不啟，不悱不發",
+"發憤忘食，樂以忘憂，不知老之將至","逝者如斯夫，不捨晝夜",
+"三軍可奪帥也，匹夫不可奪志也","歲寒，然後知松柏之後凋也",
+"後生可畏，焉知來者之不如今也","仰之彌高，鑽之彌堅",
+"己所不欲，勿施於人","工欲善其事，必先利其器",
+"人無遠慮，必有近憂","君子不以言舉人，不以人廢言",
+"君子求諸己，小人求諸人","既來之，則安之","陳力就列，不能者止",
+"不患寡而患不均，不患貧而患不安","朝聞道，夕死可矣",
+"君子喻於義，小人喻於利","見賢思齊焉，見不賢而內自省也",
+"不在其位，不謀其政","士不可以不弘毅，任重而道遠",
+"其身正，不令而行；其身不正，雖令不從","言必信，行必果",
+"往者不可諫，來者猶可追","竊鈎者誅，竊國者為諸侯",
+"吾生也有涯，而知也無涯","朝菌不知晦朔，蟪蛄不知春秋",
+"君子之交淡如水，小人之交甘若醴",
+"橘生淮南則為橘，生於淮北則為枳","十年樹木，百年樹人",
+"民為貴，社稷次之，君為輕","窮則獨善其身，達則兼濟天下",
+"盡信書，則不如無書","老吾老，以及人之老；幼吾幼，以及人之幼",
+"天時不如地利，地利不如人和","得道者多助，失道者寡助",
+"當今之世，捨我其誰也","生於憂患，死於安樂",
+"富貴不能淫，貧賤不能移，威武不能屈","人有不為也，而後可以有為",
+"學不可以已。青，取之於藍，而青於藍；冰，水為之，而寒於水",
+"故木受繩則直，金就礪則利，君子博學而日參省乎已，則知明而行無過矣",
+"故不積跬步，無以至千里；不積小流，無以成江海",
+"鍥而捨之，朽木不折；鍥而不捨，金石可鏤",
+"蓬生麻中，不扶而直；白沙在涅，與之俱黑",
+"天行有常，不為堯存，不為桀亡","道雖邇，不行不至；事雖小，不為不成",
+"千里之堤，潰於蟻穴","以子之矛，攻子之盾","事以密成，語以泄敗",
+"流水不腐，户樞不蠹","以湯止沸，沸愈不止，去其火則止矣",
+"察己則可以知人，察今則可以知古","獨學而無友，則孤陋而寡聞",
+"玉不琢，不成器，人不學，不知道","凡事預則立，不預則廢",
+"來而不往，非禮也","一張一弛，文武之道也",
+"君子之愛人也以德，細人之愛人也以姑息",
+"泰山不讓土壤，故能成其大；河海不擇細流，故能就其深",
+"臨淵羡魚，不如退而結網","塞翁失馬，焉知非福","失之毫厘，謬以千里",
+"桃李不言，下自成蹊","智者千慮，必有一失；愚者千慮，必有一得",
+"韓信將兵，多多益善","運籌帷幄之中，決勝千里之外",
+"良藥苦口利於病，忠言逆耳利於行","今者項莊拔劍舞，其意常在沛公也",
+"大行不顧細謹，大禮不辭小讓，如今人方為刀俎，我為魚肉，何辭為",
+"不鳴則已，一鳴驚人","顧小而忘大，後必有害；狐疑猶豫，後必有悔",
+"眾口鑠金，積毁銷骨","倉廩實而知禮節，衣食足而知榮辱",
+"天下熙熙，皆為利來；天下攘攘，皆為利往",
+"亦欲以究天人之際，通古今之變，成一家之言",
+"人固有一死，或重於泰山，或輕於鴻毛","盈盈一水間，脈脈不得語",
+"舉手長勞勞，二情同依依","繩鋸木斷，水滴石穿",
+"水至清則無魚，人至察則無徒","少壯不努力，老大徒傷悲",
+"失之東隅，收之桑榆","精誠所至，金石為開","不入虎穴，焉得虎子",
+"貧賤之知不可忘，糟糠之妻不下堂","君子不患位之不尊，而患德之不崇",
+"老驥伏櫪，志在千里；烈士暮年，壯心不已",
+"山不厭高，海不厭深；周公吐哺，天下歸心",
+"白骨露於野，千里無雞鳴","捐軀赴國難，視死忽如歸",
+"歲月不居，時節如流","何意百煉鋼，化為繞指柔",
+"鞠躬盡瘁，死而後已","非淡泊無以明志，非寧靜無以致遠",
+"非學無以廣才，非志無以成學","受任於敗軍之際，奉命於危難之間",
+"勿以惡小而為之，勿以善小而不為","采菊東籬下，悠然見南山",
+"羈鳥戀舊林，池魚思故淵","雲無心以出岫，鳥倦飛而知還",
+"木欣欣以向榮，泉涓涓而始流","及時當勉勵，歲月不待人",
+"盛年不重來，一日難再晨","刑天舞干戚，猛志固常在",
+"不戚戚於貧賤，不汲汲於富貴","池塘生春草，園柳變鳴禽",
+"寧為玉碎，不為瓦全","欲人勿知，莫若勿為","近朱者赤，近墨者黑",
+"登山則情滿於山，觀海則意溢於海","操千曲而後曉聲，觀千劍而後識器",
+"餘霞散成綺，澄江靜如練","蟬噪林愈靜，鳥鳴山更幽",
+"疾風知勁草，板蕩識誠臣","海內存知己，天涯若比鄰",
+"落霞與孤鶩齊飛，秋水共長天一色","馮唐易老，李廣難封",
+"念天地之悠悠，獨愴然而涕下","江畔何人初見月，江月何年初照人",
+"春江潮水連海平，海上明月共潮生","年年歲歲花相似，歲歲年年人不同",
+"海上生明月，天涯共此時","思君如滿月，夜夜減清輝",
+"野曠天低樹，江清月近人","氣蒸雲夢澤，波撼岳陽城",
+"草木本無意，榮枯自有時","大漠孤煙直，長河落日圓",
+"獨在異鄉為異客，每逢佳節倍思親","勸君更盡一杯酒，西出陽關無故人",
+"月出驚山鳥，時鳴春澗中","行到水窮處，坐看雲起時",
+"秦時明月漢時關，萬里長征人未還","但使龍城飛將在，不教胡馬度陰山",
+"洛陽親友如相問，一片冰心在玉壺","黃沙百戰穿金甲，不破樓蘭終不還",
+"欲窮千里目，更上一層樓","莫愁前路無知己，天下誰人不識君",
+"忽如一夜春風來，千樹萬樹梨花開","近鄉情更怯，不敢問來人",
+"少小離家老大回，鄉音無改鬢毛衰","兒童相見不相識，笑問客從何處來",
+"不知細葉誰裁出，二月春風似剪刀","晴川歷歷漢陽樹，芳草萋萋鸚鵡洲",
+"報國行赴難，古來皆共然","桃花潭水深千尺，不及汪倫送我情",
+"安能摧眉折腰事權貴，使我不得開心顏","不知明鏡裡，何處得秋霜",
+"但使主人能醉客，不知何處是他鄉","浮雲遊子意，落日故人情",
+"黃河之水天上來，奔流到海不復回","天生我材必有用，千金散盡還復來",
+"俱懷逸興壯思飛，欲上青天攬明月","抽刀斷水水更流，舉杯消愁愁更愁",
+"燕山雪花大如席，片片吹落軒轅台","大鵬一日同風起，扶搖直上九萬里",
+"舉杯邀明月，對影成三人","仰天大笑出門去，我輩豈是蓬蒿人",
+"清水出芙蓉，天然去雕飾","孤帆遠影碧空盡，惟見長江天際流",
+"長風破浪會有時，直掛雲帆濟滄海",
+"劍閣崢嶸而崔嵬，一夫當關，萬夫莫開",
+"射人先射馬，擒賊先擒王","爾曹身與名俱滅，不廢江河萬古流",
+"會當凌絕頂，一覽眾山小","好雨知時節，當春乃發生",
+"細雨魚兒出，微風燕子斜","映階碧草自春色，隔葉黃鸝空好音",
+"出師未捷身先死，長使英雄淚滿襟","吳楚東南坼，乾坤日夜浮",
+"筆落驚風雨，詩成泣鬼神","敏捷詩千首，飄零酒一杯",
+"萬里悲秋常作客，百年多病獨登台","無邊落木蕭蕭下，不盡長江滾滾來",
+"白日放歌須縱酒，青春作伴好還鄉",
+"安得廣厦千萬間，大庇天下寒士俱歡顏，風雨不動安如山",
+"露從今夜白，月是故鄉明","朱門酒肉臭，路有凍死骨",
+"烽火連三月，家書抵萬金","讀書破萬卷，下筆如有神",
+"窗含西嶺千秋雪，門泊東吳萬里船","為人性僻耽佳句，語不驚人死不休",
+"正是江南好風景，落花時節又逢君","春潮帶雨晚來急，野渡無人舟自橫",
+"誰言寸草心，報得三春暉","春風得意馬蹄疾，一日看盡長安花",
+"人面不知何處去，桃花依舊笑春風","不塞不流，不止不行",
+"古之學者必有師。師者，所以傳道授業解惑也","道之所存，師之所存也",
+"三人行，則必有我師。是故弟子不必不如師，師不必賢於弟子",
+"天街小雨潤如酥，草色遙看近卻無","大凡物不得其平則鳴",
+"蚍蜉撼大樹，可笑不自量","業精於勤荒於嬉，行成於思毀於隨",
+"昆山玉碎鳳凰叫，芙蓉泣露香蘭笑","女媧煉石補天處，石破天驚逗秋雨",
+"黑雲壓城城欲摧，甲光向日金鱗開","大漠沙如雪，燕山月似鈎",
+"我有迷魂招不得，雄雞一叫天下白","衰蘭送客咸陽道，天若有情天亦老",
+"千山鳥飛絕，萬徑人踪滅","山圍故國周遭在，潮打空城寂寞回",
+"舊時王謝堂前燕，飛入尋常百姓家","莫道桑榆晚，為霞尚滿天",
+"晴空一鶴排雲上，便引詩情到碧霄","沉舟側畔千帆過，病樹前頭萬木春",
+"東邊日出西邊雨，道是無晴卻有晴",
+"山不在高，有仙則名；水不在深，有龍則靈",
+"亂花漸欲迷人眼，淺草才能沒馬蹄","一道殘陽鋪水中，半江瑟瑟半江紅",
+"試玉要燒三日滿，辨材須待七年期","野火燒不盡，春風吹又生",
+"文章合為時而著，歌詩合為事而作","同是天涯淪落人，相逢何必曾相識",
+"別有幽愁暗恨生，此時無聲勝有聲","在天願作比翼鳥，在地願為連理枝",
+"江南好，風景舊曾諳。日出江花紅勝火，春來江水綠如藍。能不憶江南",
+"醉卧沙場君莫笑，古來征戰幾人回","千里鶯啼綠映紅，水村山郭酒旗風",
+"清明時節雨紛紛，路上行人欲斷魂","微雨池塘見，好風襟袖知",
+"門外若無南北路，人間應免別離愁","停車坐愛楓林晚，霜葉紅於二月花",
+"商女不知亡國恨，隔江猶唱後庭花","二十四橋明月夜，玉人何處教吹蕭",
+"歷覽前賢國與家，成由勤儉敗於奢","春蠶到死絲方盡，蠟炬成灰淚始乾",
+"身無彩鳳雙飛翼，心有靈犀一點通","滄海月明珠有淚，藍田日暖玉生煙",
+"莊生曉夢迷蝴蝶，望帝春心托杜鵑","桐花萬里丹山路，雛鳳清於老鳳聲",
+"夕陽無限好，只是近黃昏","天意憐幽草，人間重晚情",
+"曾經滄海難為水，除卻巫山不是雲","不是花中偏愛菊，此花開盡更無花",
+"春種一粒粟，秋收萬顆子","姑蘇城外寒山寺，夜半鐘聲到客船",
+"柴門聞犬吠，風雪夜歸人",
+"勸君莫惜金縷衣，勸君惜取少年時。花開堪折直須折，莫待無花空折枝",
+"溪雲初起日沉閣，山雨欲來風滿樓","西塞山前白鷺飛，桃花流水鱖魚肥",
+"別時容易見時難。流水落花春去也，天上人間",
+"先天下之憂而憂，後天下之樂而樂","醉翁之意不在酒，在乎山水之間也",
+"憂勞可以興國，逸豫可以亡身，自然之理也",
+"衣帶漸寬終不悔，為伊消得人憔悴",
+"多情自古傷離別，更那堪，冷落清秋節","今宵酒醒何處，楊柳岸，曉風殘月",
+"鑒前世之興衰，考當今之得失","兼聽則明，偏信則暗",
+"由儉人奢易，由奢人儉難","春風又綠江南岸，明月何時照我還",
+"不畏浮雲遮望眼，只緣身在最高層","千門萬戶曈曈日，總把新桃換舊符",
+"荷盡已無擎雨蓋，菊殘猶有傲霜枝","大勇若怯，大智若愚",
+"大江東去，浪淘盡，千古風流人物","江山如畫，一時多少豪傑",
+"枝上柳綿吹又少，天涯何處無芳草","欲把西湖比西子，淡妝濃抹總相宜",
+"人有悲歡離合，月有陰晴圓缺","但願人長久，千里共嬋娟",
+"不識廬山真面目，只緣身在此山中","竹外桃花三兩枝，春江水暖鴨先知",
+"月出於東山之上，徘徊於斗牛之間","園囿之興廢，洛陽盛衰之候也",
+"一春魚雁無消息，千里關山勞夢魂","兩情若是久長時，又豈在朝朝暮暮",
+"出淤泥而不染，濯清漣而不妖","莫道不銷魂，簾捲西風，人比黃花瘦",
+"只恐雙溪舴艋舟，載不動許多愁",
+"花自飄零水自流，一種相思，兩處閒愁。此情無計可消除，才下眉頭，卻上心頭",
+"尋尋覓覓，冷冷清清，淒淒慘慘戚戚","生當作人傑，死亦為鬼雄",
+"無意苦爭春，一任群芳妒","僵卧孤村不自哀，尚思為國戍輪台",
+"紙上得來終覺淺，絕知此事要躬行","文章本天成，妙手偶得之",
+"山重水複疑無路，柳暗花明又一村","出師一表真名世，千載誰堪伯仲間",
+"疏影橫斜水清淺，暗香浮動月黃昏","小荷才露尖尖角，早有蜻蜓立上頭",
+"接天蓮葉無窮碧，映日荷花別樣紅","畢竟西湖六月中，風光不與四時同",
+"月兒彎彎照九州，幾家歡樂幾家愁","春花秋月冬冰雪，不聽陳言只聽天",
+"稻花香裡說豐年，聽取蛙聲一片","楚天千里清秋，水隨天去秋無際",
+"眾裡尋他千百度，驀然回首，那人卻在燈火闌珊處",
+"青山遮不住，畢竟東流去","二十四橋仍在，波心蕩，冷月無聲",
+"一語天然萬古新，豪華落盡見真淳",
+"林間新綠一重重，小蕾深藏數點紅","臣心一片磁針石，不指南方不肯休",
+"山河破碎風瓢絮，身世浮沉雨打萍","人生自古誰無死，留取丹心照汗青",
+"無可奈何花落去，似曾相識燕歸來","春色滿園關不住，一枝紅杏出牆來",
+"即以其人之道，還治其人之身","等閒識得東風面，萬紫千紅總是春",
+"問渠那得清如許，為有源頭活水來","讀書千遍，其義自見",
+"三十功名塵與土，八千里路雲和月","不要人誇顏色好，只留清氣滿乾坤",
+"著意栽花花不發，無意插柳柳成蔭","成也蕭何，敗也蕭何，醉了由他",
+"碧雲天，黃花地，西風緊，北雁南飛。曉來誰染霜林醉，總是離人淚",
+"一言既出，駟馬難追","不是一番寒徹骨，怎得梅花撲鼻香",
+"十年窗下無人問，一舉成名天下知","良辰美景奈何天，賞心樂事誰家院",
+"金玉其外，敗絮其中","人逢喜事精神爽，月到中秋分外明",
+"觀棋不語真君子，把酒多言是小人","留得青山在，不怕沒柴燒",
+"謀事在人，成事在天","周郎妙計安天下，賠了夫人又折兵",
+"明日復明日，明日何其多。我生待明日，萬事成蹉跎",
+"粉身碎骨渾不怕，要留清白在人間","但願蒼生俱飽暖，不辭辛苦出山林",
+"世事洞明皆學問，人情練達即文章","友如作畫須求淡，山似論文不喜平",
+"千磨萬擊還堅勁，任爾東西南北風",
+"海納百川，有容乃大；壁立千仞，無欲則剛",
+"天下興亡，匹夫有責","落紅不是無情物，化作春泥更護花",
+"九州生氣恃風雷，萬馬齊暗究可哀","我勸天公重抖擻，不拘一格降人才",
+"我自橫刀向天笑，去留肝膽兩崑崙","江山代有才人出，各領風騷數百年",
+"橫眉冷對千夫指，俯首甘為孺子牛","寄意寒星荃不察，我以我血薦軒轅",
+"俏也不爭春，只把春來報。待到山花爛漫時，她在叢中笑",
+"天若有情天亦老，人間正道是滄桑"
+];
+
+// ============================================================
+// 數學科常量 - 鎖定高三範圍 (不可修改)
+// ============================================================
+const MATH_LEVEL = "高三 (Grade 12 / F.6)";
+const MATH_TOPICS = Object.freeze([
+  "不等式","方程與方程組","指數與對數","函數",
+  "數列與數學歸納法","三角函數","排列與組合","概率"
+]);
+
+const MATH_CHOICE = [
+  { q:"若 $|x-2| < 3$，則 $x$ 的取值範圍為", opts:["$-1 < x < 5$","$-1 \\leq x \\leq 5$","$x < -1$ 或 $x > 5$","$x \\leq -1$ 或 $x \\geq 5$","$-3 < x < 3$"], ans:0, hint:"絕對值不等式 $|x-a|<b$ 等價於 $-b < x-a < b$，移項即可得解。" },
+  { q:"若 $x > 0$，則 $x + \\dfrac{1}{x}$ 的最小值為", opts:["$1$","$2$","$\\dfrac{1}{2}$","$4$","$\\sqrt{2}$"], ans:1, hint:"利用均值不等式：$x + \\dfrac{1}{x} \\geq 2\\sqrt{x \\cdot \\dfrac{1}{x}} = 2$。" },
+  { q:"方程 $x^3 - 6x^2 + 11x - 6 = 0$ 的三個實根之和為", opts:["$6$","$-6$","$11$","$-11$","$1$"], ans:0, hint:"韋達定理：對於 $x^3+ax^2+bx+c=0$，三根之和 $= -a$。本題 $a=-6$，故和為 $6$。" },
+  { q:"若 $\\alpha,\\beta$ 是 $x^2-5x+6=0$ 的兩根，則 $\\alpha^2+\\beta^2$ 為", opts:["$13$","$25$","$7$","$11$","$37$"], ans:0, hint:"$\\alpha+\\beta=5$, $\\alpha\\beta=6$，$\\alpha^2+\\beta^2=(\\alpha+\\beta)^2-2\\alpha\\beta$。" },
+  { q:"$\\log_2 6 - \\log_2 3$ 的值為", opts:["$1$","$2$","$3$","$\\log_2 3$","$\\dfrac{1}{2}$"], ans:0, hint:"利用對數運算法則：$\\log_a M - \\log_a N = \\log_a \\dfrac{M}{N}$。" },
+  { q:"若 $2^x = 5$，則 $4^{x-1}$ 的值為", opts:["$\\dfrac{5}{4}$","$\\dfrac{25}{4}$","$5$","$\\dfrac{5}{2}$","$10$"], ans:1, hint:"$4^{x-1}=(2^2)^{x-1}=2^{2x-2}=\\dfrac{(2^x)^2}{4}=\\dfrac{25}{4}$。" },
+  { q:"函數 $f(x)=x^2-4x+3$ 的最小值為", opts:["$-1$","$1$","$3$","$-3$","$0$"], ans:0, hint:"配方：$f(x)=(x-2)^2-1$，最小值在 $x=2$ 取得。" },
+  { q:"等差數列 $3,7,11,15,\\cdots$ 的第 $20$ 項為", opts:["$79$","$83$","$77$","$81$","$75$"], ans:0, hint:"等差數列通項：$a_n = a_1 + (n-1)d$，其中 $a_1=3$, $d=4$。" },
+  { q:"$\\sin 75°$ 的值為", opts:["$\\dfrac{\\sqrt{6}+\\sqrt{2}}{4}$","$\\dfrac{\\sqrt{6}-\\sqrt{2}}{4}$","$\\dfrac{\\sqrt{3}+1}{4}$","$\\dfrac{\\sqrt{3}-1}{4}$","$\\dfrac{\\sqrt{2}+1}{4}$"], ans:0, hint:"利用和角公式：$\\sin75°=\\sin(45°+30°)=\\sin45°\\cos30°+\\cos45°\\sin30°$。" },
+  { q:"若 $\\sin\\theta=\\dfrac{3}{5}$ 且 $\\theta$ 為第二象限角，則 $\\cos\\theta$ 為", opts:["$-\\dfrac{4}{5}$","$\\dfrac{4}{5}$","$-\\dfrac{3}{5}$","$\\dfrac{3}{5}$","$-\\dfrac{5}{4}$"], ans:0, hint:"利用同角關係：$\\sin^2\\theta+\\cos^2\\theta=1$，第二象限 $\\cos\\theta<0$。" },
+  { q:"從 10 人中選 3 人，共有多少種選法", opts:["$120$","$720$","$210$","$30$","$1000$"], ans:0, hint:"組合數公式：$C_{10}^3=\\dfrac{10!}{3!\\times7!}=\\dfrac{10\\times9\\times8}{6}=120$。" },
+  { q:"5 人排成一列，甲乙相鄰的排法有", opts:["$48$","$24$","$120$","$60$","$72$"], ans:0, hint:"相鄰問題用捆綁法：將甲乙視為一體，$4! \\times 2! = 48$。" },
+  { q:"擲兩枚公正骰子，點數之和為 7 的概率為", opts:["$\\dfrac{1}{6}$","$\\dfrac{1}{12}$","$\\dfrac{7}{36}$","$\\dfrac{1}{9}$","$\\dfrac{5}{36}$"], ans:0, hint:"和為7的組合有6種：$(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)$，共 $36$ 種等可能結果。" },
+  { q:"若 $a,b>0$ 且 $a+b=4$，則 $ab$ 的最大值為", opts:["$4$","$8$","$2$","$16$","$6$"], ans:0, hint:"均值不等式：$ab \\leq \\left(\\dfrac{a+b}{2}\\right)^2=4$，等號在 $a=b=2$ 成立。" },
+  { q:"函數 $y=2\\sin\\left(2x+\\dfrac{\\pi}{3}\\right)$ 的週期為", opts:["$\\pi$","$2\\pi$","$\\dfrac{\\pi}{2}$","$4\\pi$","$\\dfrac{\\pi}{3}$"], ans:0, hint:"正弦函數週期公式：$T=\\dfrac{2\\pi}{\\omega}=\\dfrac{2\\pi}{2}=\\pi$。" },
+  { q:"方程 $4^x-5\\cdot2^x+6=0$ 的解為", opts:["$x=1$ 或 $x=\\log_2 3$","$x=2$ 或 $x=3$","$x=1$ 或 $x=2$","$x=\\log_2 5$","$x=\\log_4 6$"], ans:0, hint:"令 $t=2^x$，化為 $t^2-5t+6=0$，解出 $t$ 後再求 $x$。" },
+  // 新增題目
+  { q:"若 $|x+1| \\leq 2$，則 $x$ 的取值範圍為", opts:["$-3 \\leq x \\leq 1$","$-3 < x < 1$","$-1 \\leq x \\leq 3$","$-1 < x < 3$","$-2 \\leq x \\leq 2$"], ans:0, hint:"絕對值不等式 $|x+1| \\leq 2$ 等價於 $-2 \\leq x+1 \\leq 2$，移項得解。" },
+  { q:"$\\cos 15°$ 的值為", opts:["$\\dfrac{\\sqrt{6}+\\sqrt{2}}{4}$","$\\dfrac{\\sqrt{6}-\\sqrt{2}}{4}$","$\\dfrac{\\sqrt{3}}{2}$","$\\dfrac{1}{2}$","$\\dfrac{\\sqrt{2}}{2}$"], ans:1, hint:"利用差角公式：$\\cos15°=\\cos(45°-30°)=\\cos45°\\cos30°+\\sin45°\\sin30°$。" },
+  { q:"等比數列 $2,6,18,54,\\cdots$ 的公比為", opts:["$3$","$2$","$\\dfrac{1}{3}$","$4$","$\\dfrac{1}{2}$"], ans:0, hint:"等比數列公比 $q=\\dfrac{a_2}{a_1}=\\dfrac{6}{2}=3$。" },
+  { q:"若 $e^x = 3$，則 $x$ 的值為", opts:["$\\ln 3$","$3$","$\\log_3 e$","$\\dfrac{1}{3}$","$\\sqrt{3}$"], ans:0, hint:"對數定義：若 $e^x = 3$，則 $x = \\ln 3$。" },
+  { q:"$\\lim_{n \\to \\infty} \\dfrac{2n+1}{3n-2}$ 的值為", opts:["$\\dfrac{2}{3}$","$0$","$1$","$\\infty$","$\\dfrac{1}{3}$"], ans:0, hint:"分子分母同除以 $n$：$\\lim_{n \\to \\infty} \\dfrac{2+\\dfrac{1}{n}}{3-\\dfrac{2}{n}}=\\dfrac{2}{3}$。" }
+];
+
+const MATH_FILL = [
+  { q:"若 $x^2-5x+6 \\leq 0$，則 $x$ 的最大整數值為____", ans:"3", hint:"$(x-2)(x-3) \\leq 0$，得 $2 \\leq x \\leq 3$。" },
+  { q:"$\\log_3 81$ 的值為____", ans:"4", hint:"$3^4=81$，所以 $\\log_3 81=4$。" },
+  { q:"函數 $f(x)=x^2-6x+5$ 的頂點 $x$ 座標為____", ans:"3", hint:"配方：$f(x)=(x-3)^2-4$，頂點 $x$ 座標為 $3$。" },
+  { q:"等差數列中 $a_1=5$, $a_{10}=32$，則公差 $d$=____", ans:"3", hint:"等差數列通項：$a_{10}=a_1+9d$，即 $32=5+9d$，解得 $d=3$。" },
+  { q:"$C_8^3$ 的值為____", ans:"56", hint:"組合公式：$C_8^3=\\dfrac{8\\times7\\times6}{3\\times2\\times1}=\\dfrac{336}{6}=56$。" },
+  { q:"若 $f(x)=2x+1$，則 $f(f(2))$ 的值為____", ans:"11", hint:"先求 $f(2)=2\\times2+1=5$，再求 $f(5)=2\\times5+1=11$。" },
+  { q:"等比數列 $1,2,4,8,\\cdots$ 的前 5 項和為____", ans:"31", hint:"等比數列前5項：$1+2+4+8+16=31$。" },
+  { q:"$\\cos 60°$ 的值為____（以分數表示）", ans:"1/2", hint:"特殊角三角函數值：$\\cos 60°=\\dfrac{1}{2}$。" },
+  { q:"若 $|x-3|=5$，則 $x$ 的可能值之和為____", ans:"6", hint:"$|x-3|=5$ 等價於 $x-3=5$ 或 $x-3=-5$，解得 $x=8$ 或 $x=-2$，和為 $6$。" },
+  { q:"$\\tan 45°$ 的值為____", ans:"1", hint:"特殊角三角函數值：$\\tan 45°=1$。" },
+  { q:"若 $\\log_2 x = 5$，則 $x$=____", ans:"32", hint:"$\\log_2 x = 5$ 等價於 $x = 2^5 = 32$。" },
+  { q:"等差數列前 $n$ 項和 $S_n=\\dfrac{n(3n+1)}{2}$，則第 $n$ 項 $a_n$=____", ans:"3n-2", hint:"$a_n=S_n-S_{n-1}=\\dfrac{n(3n+1)}{2}-\\dfrac{(n-1)(3n-2)}{2}=3n-2$。" }
+];
+
+// ============================================================
+// 英文科題庫 - CEFR B2-C1
+// ============================================================
+const ENGLISH_BANK = [
+  // 英譯中題目
+  { type:"en2cn", q:"What does \"ubiquitous\" mean?", opts:["無處不在的","獨一無二的","短暫的","昂貴的","神秘的"], ans:0, hint:"💡 ubi(無處)+qu(i)+ous(形容詞) = 無處不在的。想想到處都有的WiFi信號！" },
+  { type:"en2cn", q:"What does \"pernicious\" mean?", opts:["有害的，惡性的","持久的","珍貴的","明顯的","和諧的"], ans:0, hint:"💡 per(完全)+nic(死亡)+ious = 致命的、有害的。如「pernicious effect」指緩慢但具破壞性的影響。" },
+  { type:"en2cn", q:"What does \"resilient\" mean?", opts:["有彈性的，能迅速恢復的","固執的","懶惰的","虛弱的","冷漠的"], ans:0, hint:"💡 聯想橡皮筋被拉長後能彈回原狀。如「resilient child」指適應力強的孩子。" },
+  { type:"en2cn", q:"What does \"ephemeral\" mean?", opts:["短暫的，轉瞬即逝的","永恆的","巨大的","微小的","古老的"], ans:0, hint:"💡 ephemera(蜉蝣，生命僅一天) + al = 短暫的。如曇花、流星都是ephemeral的事物。" },
+  { type:"en2cn", q:"What does \"pragmatic\" mean?", opts:["務實的，實用的","悲觀的","浪漫的","理論的","保守的"], ans:0, hint:"💡 與「practical」近義。pragmatic person是指做事講究實際、不空談的人。" },
+  { type:"en2cn", q:"What does \"exacerbate\" mean?", opts:["使惡化，使加劇","消除","改善","解釋","檢查"], ans:0, hint:"💡 ex(使)+acerb(e苦)+ate = 使更痛苦。如「war exacerbated the famine」戰爭加劇了饑荒。" },
+  { type:"en2cn", q:"What does \"ambiguous\" mean?", opts:["含糊不清的，模棱兩可的","雄心勃勃的","友好的","充足的","無形的"], ans:0, hint:"💡ambi(兩者)+guous = 可以有兩種解釋的。如法律條文太模糊(ambiguous)會造成理解困難。" },
+  { type:"en2cn", q:"What does \"procrastinate\" mean?", opts:["拖延，耽擱","計算","慶祝","創新","教育"], ans:0, hint:"💡 pro(向前)+crastin(明天)+ate = 把事推到明天。明日復明日，萬事成蹉跎。" },
+  { type:"en2cn", q:"What does \"eloquent\" mean?", opts:["雄辯的，口才好的","沉默的","固執的","懶惰的","困惑的"], ans:0, hint:"💡 e(出)+loqu(說)+ent = 說話出眾的。演說家常被形容為eloquent。" },
+  { type:"en2cn", q:"What does \"scrutinize\" mean?", opts:["仔細檢查，審視","忽視","毀壞","重複","假裝"], ans:0, hint:"💡 像用放大鏡scrutinize就是仔細觀察。如海關官員會scrutinize護照。" },
+  { type:"en2cn", q:"What does \"mitigate\" mean?", opts:["減輕，緩解","加劇","忽視","消滅","隱藏"], ans:0, hint:"💡 miti(溫和)+gate = 使變溫和。如植樹可以mitigate climate change。" },
+  { type:"en2cn", q:"What does \"paradigm\" mean?", opts:["範式，典範，模式","パラドックス","批評","保證","平行線"], ans:0, hint:"💡 para(旁)+digm(顯示) = 展示給大家看的模式。如「paradigm shift」指思維模式的重大轉變。" },
+  { type:"en2cn", q:"What does \"skeptical\" mean?", opts:["懷疑的，持懷疑態度的","確信的","冷漠的","興奮的","困惑的"], ans:0, hint:"💡 skep(思考)+tical = 經過思考後保持懷疑。如科學家對新理論持skeptical態度。" },
+  { type:"en2cn", q:"What does \"empirical\" mean?", opts:["基於經驗的，實證的","理論的","虛構的","抽象的","神秘的"], ans:0, hint:"💡 empir(經驗)+ical = 依靠實際觀察而非理論的。如empirical evidence是實驗數據支持的證據。" },
+  { type:"en2cn", q:"What does \"coherent\" mean?", opts:["連貫的，有條理的","混亂的","冷漠的","固執的","困惑的"], ans:0, hint:"💡 co(一起)+her(黏)+ent = 緊密聯繫的。如一篇coherent的文章邏輯清晰、前後呼應。" },
+  // 中譯英題目
+  { type:"cn2en", q:"「妥協」的英文是", opts:["compromise","comprise","compose","compress","compel"], ans:0, hint:"💡 com(一起)+promise(承諾) = 雙方各退一步達成協議。談判時常需要compromise。" },
+  { type:"cn2en", q:"「曖昧的」的英文是", opts:["ambiguous","ambitious","amiable","ample","amorphous"], ans:0, hint:"💡 ambi(兩者)+guous = 可作兩種解釋的。如「ambiguous answer」指含糊不清的回答。" },
+  { type:"cn2en", q:"「後果」的英文是", opts:["consequence","sequence","subsequence","preference","reference"], ans:0, hint:"💡 con(隨著)+sequi(跟隨) = 隨之而來的結果。如「face the consequences」承擔後果。" },
+  { type:"cn2en", q:"「不可或缺的」的英文是", opts:["indispensable","independent","indistinguishable","incredible","indifferent"], ans:0, hint:"💡 in(不)+dispensable(可省去的) = 不可省去的。如氧氣對生命indispensable。" },
+  { type:"cn2en", q:"「激勵」的英文是", opts:["motivate","dominate","nominate","eliminate","simulate"], ans:0, hint:"💡 motiv(動機)+ate = 給予動機、激發。如老師的話motivate了學生。" },
+  { type:"cn2en", q:"「多樣性」的英文是", opts:["diversity","variety","university","adversity","reversity"], ans:0, hint:"💡 divers(多樣)+ity(名詞) = 不同種類的集合。如「cultural diversity」文化多樣性。" },
+  { type:"cn2en", q:"「可持續的」的英文是", opts:["sustainable","suspicious","spontaneous","substantial","subordinate"], ans:0, hint:"💡 sustain(維持)+able(能...的) = 可長期維持的。如「sustainable development」可持續發展。" },
+  { type:"cn2en", q:"「果斷的」的英文是", opts:["decisive","precise","verbose","vague","hesitant"], ans:0, hint:"💡 decid(決定)+ive = 善於做決定的。如「decisive leader」能迅速做出正確決定。" },
+  { type:"cn2en", q:"「傲慢的」的英文是", opts:["arrogant","humble","modest","gentle","kind"], ans:0, hint:"💡 過度自信、看不起別人的態度。如「arrogant attitude」會讓人反感。" },
+  { type:"cn2en", q:"「處理所」的英文是", opts:["address","defend","ignore","delay","cancel"], ans:0, hint:"💡 address a problem是正式用語，意為「處理、應對」問題，而非「地址」！" },
+  { type:"cn2en", q:"「分析的」的英文是", opts:["analytical","critical","creative","practical","emotional"], ans:0, hint:"💡 analys(分析)+tical = 善於分解問題的。如「analytical mind」分析性思維。" },
+  { type:"cn2en", q:"「假設的」的英文是", opts:["hypothetical","actual","real","certain","definite"], ans:0, hint:"💡 hypothesi(假設)+tical = 基於假設的。如「hypothetical question」假設性問題。" },
+  // 填空題
+  { type:"fill_en", q:"Please fill in: The government took ___ measures. (果斷的)", ans:"decisive", alts:["resolute","bold"], hint:"💡 decisive/bold measures = 果斷措施。形容迅速而堅定的行動。" },
+  { type:"fill_en", q:"Please fill in: Her ___ attitude made her unpopular. (傲慢的)", ans:"arrogant", alts:["haughty","condescending"], hint:"💡 arrogant/haughty = 傲慢的。這種態度會讓人觉得难以接近。" },
+  { type:"fill_en", q:"Please fill in: We need to ___ the problem. (處理)", ans:"address", alts:["tackle","handle","resolve"], hint:"💡 address the problem = 正式處理問題。也可說tackle/handle。" },
+  { type:"fill_cn", q:"Translate: \"perseverance\"", ans:"堅持不懈", hint:"💡 per(完全)+sever(嚴格) = 始終保持嚴格態度。意思是麵對困難不放棄。" },
+  { type:"fill_cn", q:"Translate: \"unprecedented\"", ans:"史無前例的", hint:"💡 un(沒有)+precedent(先例)+ed = 沒有先例的。形容從未發生過的事。" },
+  { type:"fill_cn", q:"Translate: \"synergy\"", ans:"協同效應", hint:"💡 syn(一起)+ergy(工作) = 合作產生的額外效果。1+1>2的效果。" },
+  { type:"fill_cn", q:"Translate: \"innovation\"", ans:"創新", hint:"💡 in(進入)+nov(新)+ation = 引進新事物的行為或結果。" },
+  { type:"fill_cn", q:"Translate: \"comprehensive\"", ans:"全面的，綜合的", hint:"💡 compre hend(抓住)+sive = 能全面覆蓋的。如comprehensive study全面研究。" }
+];
+
+// ============================================================
+// 工具函數
+// ============================================================
+const SC_TC = {'学':'學','习':'習','书':'書','写':'寫','画':'畫','识':'識','读':'讀','语':'語','话':'話','说':'說','论':'論','认':'認','记':'記','议':'議','设':'設','许':'許','该':'該','详':'詳','证':'證','评':'評','词':'詞','译':'譯','试':'試','诗':'詩','诚':'誠','诺':'諾','谓':'謂','谁':'誰','国':'國','团':'團','圆':'圓','图':'圖','场':'場','坏':'壞','坚':'堅','坛':'壇','坝':'壩','墙':'牆','壳':'殼','夹':'夾','奖':'獎','复':'復','备':'備','传':'傳','伤':'傷','亿':'億','从':'從','仅':'僕','华':'華','协':'協','单':'單','卖':'賣','发':'發','变':'變','叠':'疊','见':'見','观':'觀','规':'規','视':'視','觉':'覺','览':'覽','触':'觸','订':'訂','计':'計','讨':'討','忆':'憶','让':'讓','讯':'訊','讲':'講','访':'訪','诉':'訴','课':'課','调':'調','谈':'談','谊':'誼','谋':'謀','谎':'謊','谢':'謝','购':'購','赞':'贊','赠':'贈','赶':'趕','跃':'躍','践':'踐','踪':'蹤','车':'車','轨':'軌','转':'轉','轮':'輪','软':'軟','轻':'輕','载':'載','较':'較','辅':'輔','辆':'輛','输':'輸','辞':'辭','边':'邊','达':'達','迁':'遷','过':'過','运':'運','还':'還','进':'進','远':'遠','连':'連','迟':'遲','迹':'跡','选':'選','逊':'遜','递':'遞','遗':'遺','遥':'遙','邮':'郵','乡':'鄉','酿':'釀','释':'釋','里':'裡','针':'針','钓':'釣','钟':'鐘','钢':'鋼','铁':'鐵','铃':'鈴','铅':'鉛','铜':'銅','镜':'鏡','长':'長','门':'門','闭':'閉','开':'開','闻':'聞','闷':'悶','闹':'鬧','关':'關','阁':'閣','阔':'闊','阳':'陽','阴':'陰','阵':'陣','阶':'階','际':'際','陆':'陸','陈':'陳','随':'隨','险':'險','隐':'隱','隶':'隸','难':'難','杂':'雜','权':'權','条':'條','来':'來','杨':'楊','杰':'傑','极':'極','构':'構','枫':'楓','标':'標','树':'樹','栋':'棟','样':'樣','检':'檢','楼':'樓','欢':'歡','欧':'歐','历':'歷','归':'歸','杀':'殺','万':'萬','与':'與','专':'專','业':'業','东':'東','丝':'絲','两':'兩','严':'嚴','丧':'喪','个':'個','丰':'豐','临':'臨','为':'為','举':'舉','乐':'樂','买':'買','乱':'亂','争':'爭','云':'雲','亚':'亞','产':'產','享':'享','仆':'僕','伟':'偉','优':'優','仿':'仿','伙':'夥','会':'會','伞':'傘','伤':'傷','伪':'偽','倾':'傾','偿':'償','储':'儲','儿':'兒','党':'黨','兰':'蘭','兴':'興','兹':'茲','养':'養','兽':'獸',' 军':'軍','农':'農','决':'決','冲':'衝','净':'淨','凉':'涼','准':'準','凭':'憑','凯':'凱','减':'減','凤':'鳳','几':'幾','击':'擊','凿':'鑿','刘':'劉','则':'則','刚':'剛','创':'創','删':'刪','别':'別','制':'製','剧':'劇','剩':'剩','副':'副','割':'割','劝':'勸','办':'辦','务':'務','动':'動','助':'助','劲':'勁','势':'勢','劳':'勞','勋':'勛','勝':'勝','募':'募',' 匹':'匹','区':'區','医':'醫',' 卫':'衛','却':'卻',' 厂':'廠',' 厉':'厲','压':'壓',' 厨':'廚',' 厦':'廈',' 县':'縣',' 参':'參',' 叁':'參',' 双':'雙',' 叙':'敘',' 叠':'疊',' 叩':'叩',' 叹':'嘆',' 叽':'嘰',' 吓':'嚇',' 吗':'嗎',' 君':'君',' 吞':'吞',' 吧':'吧',' 吨':'噸',' 听':'聽',' 启':'啟',' 呆':'呆',' 员':'員',' 哟':'喲',' 唛':'嘜',' 唤':'喚',' 啤':'啤',' 啦':'啦',' 喂':'餵',' 喇':'喇',' 喊':'喊',' 嗯':'嗯',' 嗽':'嗽',' 嘛':'嘛',' 嘱':'囑',' 嚷':'嚷',' 囚':'囚',' 团':'團',' 困':'困',' 囱':'囪',' 场':'場',' 圾':'圾',' 址':'址',' 均':'均',' 坎':'坎',' 块':'塊',' 坚':'堅',' 坛':'壇',' 坝':'壩',' 坟':'墳',' 坡':'坡',' 坤':'坤',' 坦':'坦',' 坿':'坿',' 垄':'壟',' 型':'型',' 垒':'壘',' 垛':'垛',' 垠':'垠',' 垢':'垢',' 垣':'垣',' 垫':'墊',' 垮':'垮',' 埋':'埋',' 城':'城',' 埏':'埏',' 埔':'埔',' 域':'域',' 埠':'埠',' 埙':'塤',' 埚':'堝',' 埝':'埝',' 埤':'埤',' 埭':'埭',' 埯':'埯',' 埴':'埴',' 埵':'埵',' 埸':'埸',' 執':'執',' 埼':'埼',' 埽':'埽',' 埿':'埿',' 堀':'堀',' 堁':'堝',' 堂':'堂',' 堅':'堅',' 堆':'堆',' 堑':'塹',' 堕':'墮',' 堙':'堙',' 堝':'堝',' 堞':'堞',' 堡':'堡',' 堤':'堤',' 堧':'堧',' 堨':'堨',' 堩':'堩',' 堪':'堪',' 堰':'堰',' 報':'報',' 堲':'堲',' 堳':'堳',' 場':'場',' 堵':'堵',' 堹':'堹',' 堺':'堺',' 堻':'堻',' 堼':'堼',' 堽':'堽',' 堾':'堾',' 堿':'堿',' 塀':'塀',' 塁':'塁',' 塂':'塂',' 塃':'塃',' 塄':'塄',' 塅':'塅',' 塆':'塆',' 塇':'塇',' 塈':'塈',' 塉':'塉',' 塊':'塊',' 塋':'塋',' 塌':'塌',' 塍':'塍',' 塎':'塎',' 塏':'塏',' 塐':'塐',' 塑':'塑',' 塒':'塒',' 塓':'塓',' 塔':'塔',' 塕':'塕',' 塖':'塖',' 塗':'塗',' 塙':'塙',' 塚':'塚',' 塛':'塛',' 塜':'塜',' 塝':'塝',' 塞':'塞',' 塟':'塟',' 塠':'塠',' 塡':'塡',' 塢':'塢',' 塣':'塣',' 塤':'塤',' 塥':'塥',' 塦':'塦',' 塧':'塧',' 塨':'塨',' 塩':'塩',' 塪':'塪',' 填':'填',' 塬':'塬',' 塭':'塭',' 塮':'塮',' 塯':'塯',' 塰':'塰',' 塱':'塱',' 塲':'塲',' 塳':'塳',' 塴':'塴',' 塵':'塵',' 塶':'塶',' 塷':'塷',' 塸':'塸',' 塹':'塹',' 塺':'塺',' 塻':'塻',' 塼':'塼',' 塽':'塽',' 塾':'塾',' 塿':'塿',' 墀':'墀',' 墁':'墁',' 墂':'墂',' 境':'境',' 墄':'墄',' 墅':'墅',' 墆':'墆',' 墇':'墇',' 墈':'墈',' 墉':'墉',' 墊':'墊',' 墋':'墋',' 啌':'墌',' 墍':'墍',' 墎':'墎',' 墏':'墏',' 墐':'墐',' 墑':'墑',' 墒':'墒',' 墓':'墓',' 墔':'墔',' 墕':'墕',' 墖':'墖',' 増':'増',' 墘':'墘',' 墙':'牆',' 墚':'墚',' 墛':'墛',' 墜':'墜',' 墝':'墝',' 增':'增',' 墟':'墟',' 墠':'墠',' 墡':'墡',' 墢':'墢',' 墣':'墣',' 墤':'墤',' 墥':'墥',' 墦':'墦',' 墧':'墧',' 墨':'墨',' 墩':'墩',' 墪':'墪',' 墫':'墫',' 墬':'墬',' 墭':'墭',' 墮':'墮',' 墯':'墯',' 墰':'墰',' 墱':'墱',' 墲':'墲',' 墳':'墳',' 墴':'墴',' 墵':'墵',' 墶':'墶',' 墷':'墷',' 墸':'墸',' 墹':'墹',' 墺':'墺',' 墻':'墻',' 墼':'墼',' 墽':'墽',' 墾':'墾',' 墿':'墿',' 壀':'壀',' 壁':'壁',' 壂':'壂',' 壃':'壃',' 壄':'壄',' 壅':'壅',' 壆':'壆',' 壇':'壇',' 壈':'壈',' 壉':'壉',' 壊':'壊',' 壋':'壋',' 壌':'壌',' 壍':'壍',' 壎':'壎',' 壏':'壏',' 壐':'壐',' 壑':'壑',' 壒':'壒',' 壓':'壓',' 壔':'壔',' 壕':'壕',' 壖':'壖',' 壗':'壗',' 壘':'壘',' 壙':'壙',' 壚':'壚',' 壛':'壛',' 壜':'壜',' 壝':'壝',' 壞':'壞',' 壟':'壟',' 壠':'壠',' 壡':'壡',' 壢':'壢',' 壣':'壣',' 壤':'壤',' 壥':'壥',' 壦':'壦',' 壧':'壧',' 壨':'壨',' 壩':'壩',' 壪':'壪',' 士':'士',' 壬':'壬',' 壯':'壯',' 壵':'壵',' 壶':'壺',' 壷':'壷',' 壸':'壸',' 壹':'壹',' 壺':'壺',' 壻':'壻',' 壼':'壼',' 壽':'壽',' 壾':'壾',' 壿':'壿',' 夀':'夀',' 夁':'夁',' 夂':'夂',' 夃':'夃',' 夅':'夅',' 夆':'夆',' 夈':'夈',' 変':'変',' 夊':'夊',' 夋':'夋',' 夌':'夌',' 复':'復',' 夎':'夎',' 夏':'夏',' 夐':'夐',' 夑':'夑',' 夒':'夒',' 夓':'夓',' 夔':'夔',' 夕':'夕',' 外':'外',' 夗':'夗',' 夘':'夘',' 夙':'夙',' 多':'多',' 夛':'夛',' 夜':'夜',' 夝':'夝',' 够':'夠',' 够':'夠',' 夤':'夤',' 夥':'夥',' 夦':'夦',' 大':'大',' 夨':'夨',' 天':'天',' 夫':'夫',' 夬':'夬',' 夭':'夭',' 央':'央',' 夯':'夯',' 失':'失',' 夲':'夲',' 夳':'夳',' 头':'頭',' 夵':'夵',' 夷':'夷',' 夸':'夸',' 夹':'夾',' 夺':'奪',' 夻':'夻',' 夼':'夼',' 夽':'夽',' 夾':'夾',' 奀':'奀',' 奁':'奩',' 奂':'奐',' 奃':'奃',' 奄':'奄',' 奅':'奅',' 奆':'奆',' 奇':'奇',' 奈':'奈',' 奉':'奉',' 奊':'奊',' 奋':'奮',' 奌':'奌',' 奎':'奎',' 奐':'奐',' 契':'契',' 奒':'奒',' 奓':'奓',' 奔':'奔',' 奕':'奕',' 奖':'獎',' 套':'套',' 奘':'奘',' 奙':'奙',' 奚':'奚',' 奛':'奛',' 奜':'奜',' 奝':'奝',' 奞':'奞',' 奟':'奟',' 奠':'奠',' 奡':'奡',' 奢':'奢',' 奣':'奣',' 奥':'奧',' 奥':'奧',' 奥':'奧',' 奥':'奧',' 奥':'奧',' 奧':'奧',' 奨':'奨',' 奩':'奩',' 奪':'奪',' 奫':'奫',' 奬':'奬',' 奭':'奭',' 奮':'奮',' 奯':'奯',' 奰':'奰',' 女':'女',' 奴':'奴',' 奶':'奶',' 妅':'妅',' 妆':'妝',' 妇':'婦',' 妈':'媽',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊',' 妊':'妊'};
+
+function sc2tc(t){return t.split('').map(c=>SC_TC[c]||c).join('');}
+function normalize(t){return sc2tc(t).trim().toLowerCase();}
+function checkMatch(input,expected){
+  if(normalize(input)===normalize(expected)) return true;
+  return false;
+}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function splitQuote(q){
+  for(const p of ['，','；','。','！','？']){
+    const i=q.indexOf(p);
+    if(i>0&&i<q.length-1) return {first:q.substring(0,i).trim(),second:q.substring(i+p.length).trim()};
+  }
+  const m=Math.floor(q.length/2);
+  return {first:q.substring(0,m).trim(),second:q.substring(m).trim()};
+}
+
+function extractKeyword(q){
+  const cleaned=q.replace(/[，。、；：！？""''（）《》\s]/g,'');
+  for(let len=4;len>=2;len--){
+    for(let i=0;i<=cleaned.length-len;i++){
+      const w=cleaned.substring(i,i+len);
+      if(q.includes(w)&&w.length>=2) return w;
+    }
+  }
+  return cleaned.substring(Math.floor(cleaned.length/2),Math.floor(cleaned.length/2)+2);
+}
+
+function daySeed(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function seededRand(s){return(Math.sin(s)*10000)%1<0?-(Math.sin(s)*10000)%1:(Math.sin(s)*10000)%1;}
+
+// ============================================================
+// 渲染 KaTeX - 增強版：自動檢測並渲染所有數學公式
+// ============================================================
+function renderMathInElement(el){
+  if(!el || typeof katex === 'undefined') return;
+  const html = el.innerHTML;
+  const result = processMathText(html);
+  el.innerHTML = result;
+}
+
+// 處理文本中的數學公式（支持 $...$ 和 $$...$$）
+function processMathText(text){
+  if(!text) return '';
+  
+  // 處理 display mode 數學公式 $$...$$
+  text = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, math) => {
+    try {
+      return `<div class="katex-display"><div class="katex-math-block">${katex.renderToString(math.trim(), {displayMode: true, throwOnError: false})}</div></div>`;
+    } catch(e) {
+      return `<div class="katex-error">$$${math}$$</div>`;
+    }
+  });
+  
+  // 處理 inline mode 數學公式 $...$
+  text = text.replace(/\$([^\$\n]+?)\$/g, (match, math) => {
+    try {
+      return katex.renderToString(math.trim(), {displayMode: false, throwOnError: false});
+    } catch(e) {
+      return `<span class="katex-error-inline">$${math}$</span>`;
+    }
+  });
+  
+  return text;
+}
+
+// 渲染指定容器內所有數學元素
+function renderAllMath(container) {
+  if(!container) return;
+  const mathElements = container.querySelectorAll('.math-q, .math-opt, .math-hint, .solution-content, .hint-text');
+  mathElements.forEach(el => {
+    if(el.dataset.mathRendered !== 'true') {
+      renderMathInElement(el);
+      el.dataset.mathRendered = 'true';
+    }
+  });
+}
+
+// ============================================================
+// 狀態管理
+// ============================================================
+let state = {
+  page:'home',
+  subject:null,
+  questions:[],
+  currentQ:0,
+  results:[],
+  streak:0,
+  totalXP:0,
+  dailyProgress:0,
+  completedToday:{},
+  wrongAnswers:[], // 錯題記錄
+  darkMode:false    // 深色模式開關
+};
+
+function loadState(){
+  const d=JSON.parse(localStorage.getItem('eduspark_data')||'{}');
+  state.totalXP=d.totalXP||0;
+  const today=new Date().toDateString();
+  const last=d.lastLoginDate;
+  if(last!==today){
+    const y=new Date();y.setDate(y.getDate()-1);
+    if(last===y.toDateString()) state.streak=(d.streak||0)+1;
+    else state.streak=1;
+    localStorage.setItem('eduspark_data',JSON.stringify({...d,streak:state.streak,lastLoginDate:today}));
+  } else state.streak=d.streak||0;
+  const c=JSON.parse(localStorage.getItem('eduspark_completed')||'{}');
+  state.completedToday=c[today]||{};
+  state.dailyProgress=Math.round(Object.keys(state.completedToday).length/3*100);
+  // 載入錯題記錄
+  const w=JSON.parse(localStorage.getItem('eduspark_wrong')||'[]');
+  state.wrongAnswers=w;
+}
+
+// 記錄錯題
+function recordWrongAnswer(question, userAnswer, correctAnswer, subject, options, hint, fullQuote, type, alts, userAnswerIndex){
+  const wrong={
+    subject:subject,
+    question:question,
+    userAnswer:userAnswer,
+    correctAnswer:correctAnswer,
+    options:options||null,
+    hint:hint||'',
+    fullQuote:fullQuote||'',
+    type:type||'choice',
+    alts:alts||null,
+    userAnswerIndex:userAnswerIndex,
+    timestamp:new Date().toISOString()
+  };
+  state.wrongAnswers.push(wrong);
+  localStorage.setItem('eduspark_wrong',JSON.stringify(state.wrongAnswers));
+}
+
+// 獲取某科目的錯題
+function getWrongAnswersBySubject(subject){
+  return state.wrongAnswers.filter(w=>w.subject===subject);
+}
+
+// 移除單個錯題（答對後自動移除）
+function removeWrongAnswer(question, subject){
+  state.wrongAnswers=state.wrongAnswers.filter(w=>!(w.subject===subject&&w.question===question));
+  localStorage.setItem('eduspark_wrong',JSON.stringify(state.wrongAnswers));
+}
+
+// 清除某科目的錯題
+function clearWrongAnswers(subject){
+  state.wrongAnswers=state.wrongAnswers.filter(w=>w.subject!==subject);
+  localStorage.setItem('eduspark_wrong',JSON.stringify(state.wrongAnswers));
+}
+
+function saveCompletion(subject){
+  const today=new Date().toDateString();
+  const c=JSON.parse(localStorage.getItem('eduspark_completed')||'{}');
+  if(!c[today])c[today]={};
+  c[today][subject]=true;
+  localStorage.setItem('eduspark_completed',JSON.stringify(c));
+  state.completedToday=c[today];
+  state.dailyProgress=Math.round(Object.keys(state.completedToday).length/3*100);
+}
+
+function addXP(xp){
+  state.totalXP+=xp;
+  const d=JSON.parse(localStorage.getItem('eduspark_data')||'{}');
+  localStorage.setItem('eduspark_data',JSON.stringify({...d,totalXP:state.totalXP}));
+}
+
+// ============================================================
+// 深色/淺色模式切換
+// ============================================================
+function toggleDarkMode(){
+  state.darkMode = !state.darkMode;
+  document.body.classList.toggle('dark-mode', state.darkMode);
+  localStorage.setItem('eduspark_dark', state.darkMode?'1':'0');
+  render(); // 重新渲染以應用新主題
+}
+
+function initDarkMode(){
+  const saved = localStorage.getItem('eduspark_dark');
+  if(saved === '1'){
+    state.darkMode = true;
+    document.body.classList.add('dark-mode');
+  }
+}
+
+// ============================================================
+// 中文名句記憶技巧生成器 - 視覺化 & 對比聯想
+// ============================================================
+const MEMORY_TIPS = {
+  // ===== 《詩經》系列 =====
+  '靡不有初，鮮克有終':{
+    visual:'🎬 想像一部電影：開頭總是精彩絕倫（所有事都有開頭），但能堅持到大結局完美收場的卻寥寥無幾',
+    compare:'對比：就像健身卡 — 每年初都雄心壯志要練出腹肌，但年底還在抽屜裡吃灰',
+    keyword:'【初】→ 【終】，鮮=少'
+  },
+  '投我以桃，報之以李':{
+    visual:'🍑🥒 畫面：有人扔給你一個水蜜桃，你接著回敬他一筐脆李子 — 有來有往的禮物交換',
+    compare:'類比：像現代的「互贊」文化 — 你給我點讚，我也回你一個❤️',
+    keyword:'投桃報李 = 禮尚往來'
+  },
+  '他山之石，可以攻玉':{
+    visual:'⛰️💎 山上撿到的粗糙石頭，竟然能打磨出溫潤美玉！別人的意見就像那塊石頭',
+    compare:'對比：自己的玉（想法）有瑕疵時，需要別人山上的石頭（批評）來琢磨',
+    keyword:'他山之石 = 別人的建議/批評'
+  },
+  '昔我往矣，楊柳依依，今我來思，雨雪霏霏':{
+    visual:'🌸❄️ 雙畫面切換：離開時春風拂柳、綠意盎然；回來時大雪紛飛、滿目蒼涼。同一條路，兩個季節',
+    compare:'時間對比：出征時的「依依不捨」vs 歸鄉時的「滿心悲涼」。柳枝柔軟 vs 大雪冰冷',
+    keyword:'昔(過去)往(離開) → 今(現在)來(回)'
+  },
+  '關關雎鳩，在河之洲。窈窕淑女，君子好逑':{
+    visual:'🦆💕 河心小洲上，雎鳩鳥成雙對唱（關關叫），岸邊君子看著淑女心跳加速',
+    scene:'想像：春天河邊，水鳥求偶的歌聲引發了人間愛情的故事',
+    keyword:'逑 = 配偶/伴侶'
+  },
+  // ===== 屈原《離騷》系列 =====
+  '路漫漫其修遠兮，吾將上下而求索':{
+    visual:'🛤️🔭 一個人在漫長的路上走啊走，抬頭看天、低頭看地，不停地尋找答案',
+    compare:'現代版：「人生是一場马拉松，不是衝刺跑」— 堅持探索才是王道',
+    keyword:'修遠 = 很長很長；上下求索 = 到處找'
+  },
+  '亦余心之所善兮，雖九死其猶未悔':{
+    visual:'🔥😤 心裡那團火：就算死九次也不後悔！這是我選擇的路，跪著也要走完',
+    compare:'對比：普通人遇到困難就轉向；屈原說「轉什麼轉？死都不怕！」',
+    keyword:'九死 = 死很多次；未悔 = 不後悔'
+  },
+  '長太息以掩涕兮，哀民生之多艱':{
+    visual:'😢📜 屈原站在江邊，長長嘆氣，用手帕擦眼淚 — 不是為自己哭，是為百姓苦難而哭',
+    compare:'對比：一般詩人「為情所困」，屈原「為民哭泣」— 格局完全不同',
+    keyword:'太息 = 長嘆；掩涕 = 擦眼淚'
+  },
+  '世人皆濁我獨清，眾人皆醉我獨醒':{
+    visual:'🍺🧊 所有人都在喝醉酒（渾濁的世界），只有屈原一人清醒地站著，手裡拿著一杯清水',
+    compare:'強烈反差：醉 vs 清、濁 vs 醒 — 全世界對我一個人',
+    keyword:'獨清獨醒 = 出淤泥而不染的品格'
+  },
+  // ===== 諸子百家系列 =====
+  '學而不思則罔，思而不學則殆':{
+    visual:'📚💭 左邊：只讀書不思考 = 倉鼠搬米（忙但沒用）；右邊：只思考不學習 = 空想家做白日夢',
+    compare:'對比：「罔」（迷茫）vs「殆」（危險）— 兩者都不可取，必須學+思並重',
+    keyword:'罔=迷惑；殆=危險'
+  },
+  '己所不欲，勿施於人':{
+    visual:'↔️🚫 想像一面鏡子：你不喜歡的事，也不要對別人做。把別人當成另一個自己',
+    compare:'黃金法則：東方「己所不欲勿施於人」vs 西方「Do unto others as you would have them do to you」',
+    keyword:'施 = 施加、對待'
+  },
+  '三人行，則必有我師焉':{
+    visual:'👥📝 三個人走路：一個優點值得學，一個缺點要警惕，一個互相討論 — 人人都是老師',
+    compare:'打破迷思：老師不一定站在講台上，身邊每個人都能教會你什麼',
+    keyword:'三人行 = 幾個人一起走/相處'
+  },
+  '知之者不如好之者，好之者不如樂之者':{
+    visual:'🏆 三層樓梯：底層「知道」（哦了解了）→ 中層「喜好」（挺有意思）→ 頂層「樂在其中」（停不下來！）',
+    compare:'進階對比：知道 < 喜歡 < 熱愛 — 學習的最高境界是把苦差事變成享受',
+    keyword:'知<好<樂 三種境界'
+  },
+  '溫故而知新，可以為師矣':{
+    visual:'🔄♻️ 舊知識像冰塊，溫一下就化出新味道！複習不是浪費時間，是孵化新想法',
+    compare:'對比：一般人複習=機械重複；孔子複習=從舊知識中發現新洞見',
+    keyword:'溫故 = 複習舊知識'
+  },
+  '歲寒，然後知松柏之後凋也':{
+    visual:'🌲❄️ 平時花草都好看，只有冬天來了才發現：松柏依然翠綠！困境才能看出真品格',
+    compare:'順境 vs 逆境：順境中人人都是朋友；逆境中才知道誰是真正的「松柏」',
+    keyword:'後凋 = 最後才凋謝（其實是不凋謝）'
+  },
+  '工欲善其事，必先利其器':{
+    visual:'🔧🍳 想做出好菜？先磨刀！想寫好程式？先配好電腦！工具決定成果上限',
+    compare:'磨刀不誤砍柴工 — 花時間準備工具看似慢，實際上省更多時間',
+    keyword:'利其器 = 把工具磨快/準備好'
+  },
+  // ===== 《孟子》系列 =====
+  '生於憂患，死於安樂':{
+    visual:'⚡🛋️ 憂患像雷電，嚇到你但不會害你；安樂像溫水，舒服地煮青蛙直到死亡',
+    compare:'強烈反差：「生」vs「死」、「憂患」vs「安樂」— 舒適區是最大的陷阱',
+    keyword:'生於憂患 = 困境讓人成長'
+  },
+  '富貴不能淫，貧賤不能移，威武不能屈':{
+    visual:'💪🛡️ 三重護盾：金錢砸不動（富貴）、貧窮打不倒（貧賤）、武力嚇不退（威武）',
+    compare:'三層考驗：物質誘惑 → 生活困難 → 生命威脅 — 大丈夫全都不怕',
+    keyword:'淫=迷惑；移=改變；屈=屈服'
+  },
+  '天時不如地利，地利不如人和':{
+    visual:'⏰📍👥 天時（好天氣）< 地理（好位置）< 人和（團結）— 人心的力量最大！',
+    compare:'三級火箭：最強的不是自然條件，而是人與人之間的凝聚力',
+    keyword:'人和最重要！'
+  },
+  // ===== 《荀子·勸學》系列 =====
+  '青，取之於藍，而青於藍；冰，水為之，而寒於水':{
+    visual:'🎨🧊 學生（青色）超過老師（藍色）！冰（固態）比水（液態）更冷 — 學習讓你超越源頭',
+    compare:'師生逆轉：老師是藍草，學生是靛青 — 顏色相似但更深更純',
+    keyword:'青於藍 = 超過老師/前輩'
+  },
+  '故不積跬步，無以至千里；不積小流，無以成江海':{
+    visual:'👣💧 每一小步=跬步，積累起來=千里路；每一滴水=小流，匯聚成=大海',
+    compare:'微小 vs 偉大：千里之路始於腳下第一步，汪洋大海始於第一滴水',
+    keyword:'跬步 = 半步'
+  },
+  '鍥而捨之，朽木不折；鍥而不捨，金石可鏤':{
+    visual:'🪓💎 同樣用斧頭刻：放棄了連腐木都斷不斷；堅持下去連金石都能雕出花',
+    compare:'同工具不同結果：差別只在「堅持」二字 — 成功和失敗的分水嶺',
+    keyword:'鍥 = 刻/雕刻；鏤 = 雕刻'
+  },
+  // ===== 成語典故系列 =====
+  '塞翁失馬，焉知非福':{
+    visual:'🐴😄📉 老人丟馬 → 兒子帶回良馬 → 兒子摔傷 → 因傷免役。每次「壞事」都變成「好事」',
+    compare:'得失辯證：今天的損失可能是明天的收穫 — 禍福相依，誰說得準？',
+    keyword:'塞翁 = 邊塞的老人'
+  },
+  '亡羊而補牢，猶未遲也':{
+    visual:'🐑🚪 羊跑了才補羊圈？總比一直不補好！錯了就改，永遠不晚',
+    compare:'及時 vs 放棄：亡羊補牢 > 守株待兔 — 行動勝過空等',
+    keyword:'亡 = 丢失；牢 = 圈欄'
+  },
+  '臨淵羡魚，不如退而結網':{
+    visual:'🐟🕸️ 站在深潭邊流口水看魚游，不如回家織網再去捕魚 — 行動取代幻想',
+    compare:'羡慕 vs 實踐：空想家看魚，行動者吃魚',
+    keyword:'臨 = 面對；淵 = 深潭'
+  },
+  '桃李不言，下自成蹊':{
+    visual:'🍑👣 桃樹李樹不會說話（不自我宣傳），但因為果實甜美，人們踩出路來看它',
+    compare:'沉默 vs 吶喊：真正的魅力不需要廣告 — 品質本身就是最好的營銷',
+    keyword:'蹊 = 小路'
+  },
+  '精誠所至，金石為開':{
+    visual:'💝🪞 真誠的心像激光，連金屬和石頭都能融化穿透 — 感動的力量超乎想像',
+    compare:'軟 vs 硬：最柔軟的（真誠）能戰勝最堅硬的（金石）',
+    keyword:'精誠 = 至誠至信'
+  },
+  // ===== 唐詩系列 =====
+  '少壯不努力，老大徒傷悲':{
+    visual:'👴😭 年老的自己穿越回來，對年輕的你大喊：「別玩了！快去讀書！」但你聽不到...',
+    compare:'時間對比：少年時的「不努力」= 老年時的「徒傷悲」（白白悲傷）',
+    keyword:'徒 = 白白地'
+  },
+  '欲窮千里目，更上一層樓':{
+    visual:'🏯👀 站在一層樓只能看到街景；登上頂層能看到整座城市！高度決定視野',
+    compare:'視野層級：一層（眼前）→ 十層（城市）→ 百層（世界）— 不斷向上',
+    keyword:'窮 = 盡、達到極致'
+  },
+  '落霞與孤鶩齊飛，秋水共長天一色':{
+    visual:'🌅🦅 絕美畫面：紅霞在天上飄，孤鶩在空中飛，秋水和天空融為一色 — 自然界的和諧奇觀',
+    scene:'想像站在滕王閣上，整個世界被夕陽染成金色，天地合一',
+    keyword:'鶩 = 野鴨'
+  },
+  '海內存知己，天涯若比鄰':{
+    visual:'🌍🤝 最好的朋友就算分隔地球兩端，心也像住在隔壁一樣近 — 距離隔不斷真友情',
+    compare：「遠在天邊」vs「近在咫尺」— 物理距離 vs 心靈距離',
+    keyword:'海內 = 天下/世界'
+  },
+  '黃河之水天上來，奔流到海不復回':{
+    visual:'🌊⛰️ 黃河水從高山上傾瀉而下，像從天上掉下來一樣，奔騰入海永不回頭',
+    scene:'感受：站在壺口瀑布前，水聲震耳欲聾，感受到時間和生命的奔湧不息',
+    keyword:'不復回 = 不再回來（比喻時間一去不返）'
+  },
+  '天生我材必有用，千金散盡還復來':{
+    visual:'🦁👑 李白的自信爆棚：老天爺給我的才能肯定有用途！錢花光了又怎樣？還能再賺！',
+    compare:'消極 vs 樂觀：「沒用了」vs「必有用」、「破產了」vs「還復來」',
+    keyword:'材 = 才華/才能'
+  },
+  '長風破浪會有時，直掛雲帆濟滄海':{
+    visual:'⛵🌊 等到風來的那一天，揚帆起航，橫渡大海！暫時的低谷只是為了更大的爆發',
+    compare:'等待 vs 行動：「會有時」（相信時機）+ 「直掛雲帆」（做好準備）',
+    keyword:'濟 = 渡越'
+  },
+  // ===== 宋詩/宋詞系列 =====
+  
+  '不識廬山真面目，只緣身在此山中':{
+    visual:'⛰️🔍 在山裡找不到北！因為你就在山裡 — 要看清全局，得跳出框架',
+    compare:'局部 vs 整體：身在山中看不見全貌 = 當局者迷，旁觀者清',
+    keyword:'緣 = 因為'
+  },
+  '問渠那得清如許，為有源頭活水來':{
+    visual:'💧✨ 為什麼池水這麼清澈？因為有活水源源不斷流入！學習也是一樣 — 不斷更新',
+    compare:'死水 vs 活水：停止學習=死水變臭；持續學習=活水常新',
+    keyword:'渠 = 它（指池水）
+  },
+  '山重水複疑無路，柳暗花明又一村':{
+    visual:'🌳🌸 走到絕境了！山一重水一複，路在哪？突然轉彎— 柳暗花明的村莊出現在前方！',
+    compare:'絕望 vs 希望：「疑無路」→「又一村」— 人生最黑暗的時刻往往是黎明前',
+    keyword:'山重水複 = 山水重重疊疊'
+  },
+  '眾裡尋他千百度，驀然回首，那人卻在，燈火闌珊處':{
+    visual:'🔍💡 找了一千遍都找不到的人，猛一回頭—— 他就在燈火昏暗的角落等你！',
+    scene:'畫面：熱鬧的元宵燈會，人群熙攘，轉身瞬間發現那人一直在身後',
+    keyword:'驀然 = 突然；闌珊 = 零落稀疏'
+  },
+  '人生自古誰無死，留取丹心照汗青':{
+    visual:'❤️📜 文天祥的宣言：死亡不可怕，可怕的是活得沒骨氣！一片丹心照亮史冊',
+    compare：「苟活」vs「留名」— 寧可光榮死去，也不願羞恥偷生',
+    keyword:'汗青 = 史書（古人用竹簡記史，需火烤去汗）
+  },
+  // ===== 其他名句 =====
+  '非淡泊無以明志，非寧靜無以致遠':{
+    visual:'🧘‍♂️🎯 想瞄準遠方的目標？先把心靜下來！淡泊名利才能看清真正想要什麼',
+    compare：「浮躁」vs「寧靜」、「追逐名利」vs「明確志向」',
+    keyword:'淡泊 = 不追求名利；致 = 達到'
+  },
+  '海納百川，有容乃大；壁立千仞，無欲則剛':{
+    visual:'🌊🧱 大海因容納百川而浩瀚；峭壁因無欲求而挺拔 — 寬容和自律的力量',
+    compare：「海納」（包容性）vs「壁立」（堅定性）— 兩種不同的偉大品格',
+    keyword:'仞 = 古代長度單位'
+  }
+};
+
+/**
+ * 根據名句生成記憶技巧
+ * @param {string} quote - 完整名句
+ * @returns {object} 包含 visual, compare, scene, keyword 的記憶技巧對象
+ */
+function generateMemoryTip(quote){
+  if(!quote) return getDefaultMemoryTip();
+  
+  const trimmedQuote = quote.replace(/[「」""'']/g, '').trim();
+  
+  // 先嘗試精確匹配
+  if(MEMORY_TIPS[trimmedQuote]){
+    return MEMORY_TIPS[trimmedQuote];
+  }
+  
+  // 模糊匹配：檢查是否包含某個關鍵片段
+  for(const key of Object.keys(MEMORY_TIPS)){
+    if(key.length >= 6 && (trimmedQuote.includes(key) || key.includes(trimmedQuote.substring(0, Math.min(8, trimmedQuote.length))))){
+      return MEMORY_TIPS[key];
+    }
+  }
+  
+  // 根據名句特徵生成通用記憶技巧
+  return generateDynamicMemoryTip(trimmedQuote);
+}
+
+function getDefaultMemoryTip(){
+  return {
+    visual: '📖 把這句話想像成一個生動的畫面：試著在腦海中「播放」一段關於這句古文的短影片',
+    compare: '💡 技巧：將抽象文字轉化為具體影像 — 大腦對圖像的記憶力是文字的數倍！',
+    scene: '🎬 閉上眼睛，想像自己是古代的文人墨客，身臨其境地感受這句話的意境',
+    keyword: '【記憶口訣】理解意境 → 聯想畫面 → 反覆吟誦'
+  };
+}
+
+function generateDynamicMemoryTip(quote){
+  const len = quote.length;
+  const hasNature = /山|水|風|雨|雪|月|花|草|樹|雲|河|海|江/.test(quote);
+  const hasEmotion = /悲|喜|怒|哀|樂|愁|思|念|恨|愛|淚/.test(quote);
+  const hasTime = /昔|今|朝|暮|春|秋|冬|夏|年|月|日/.test(quote);
+  
+  let visual = '';
+  let compare = '';
+  
+  if(hasNature && hasEmotion){
+    visual = `🌿💭 這句融合了自然景色(${hasNature?'✓':''})和人物情感(${hasEmotion?'✓':''})，想像自己置身其中：周圍是${quote.match(/山|水|風|雨|雪|月|花|草|樹|雲|河|海|江/)?.[0]||'大自然'}，心中懷著${quote.match(/悲|喜|怒|哀|樂|愁|思|念|恨|愛|淚/)?.[0]||'感慨'}`;
+    compare = '🔄 情景交融：古人擅長借景抒情 — 外界環境反映內心世界，理解了背景就能理解情感';
+  } else if(hasTime){
+    visual = `⏰📜 這句涉及時間流逝或對比（${quote.match(/昔|今|朝|暮|春|秋|冬|夏/)?.[0]||'時間'}），想像時間軸上的變化：過去 vs 現在，或此刻的不同狀態`;
+    compare: '⚡ 時間維度：古今對比、早晚對比、四季對比 — 時間的流逝往往帶來深刻的感悟';
+  } else {
+    visual = `💡📝 這句話「${quote.substring(0, Math.min(10, len))}...」，試著拆解：找到其中的對仗、押韻或反義詞`;
+    compare: '🔍 分析技巧：注意句式結構 — 排比增強語氣、對偶便於記憶、反襯突出重點';
+  }
+  
+  return {
+    visual: visual,
+    compare: compare,
+    scene: `🎭 想像朗誦這句話時的語調：哪里該停頓、哪里該加重語氣？用自己的方式演繹它`,
+    keyword: `【快速記憶】抓住關鍵字：${quote.substring(0, 4)}... → 理解含義 → 腦海成像`
+  };
+}
+
+// ============================================================
+// 出題邏輯
+// ============================================================
+function genChinese(){
+  // 使用真正隨機數，每次練習都不同
+  // 從3句不同詩句中各生成1道題目
+  const allQuotes=[...CHINESE_QUOTES];
+  const shuffledQuotes=shuffle(allQuotes);
+  
+  // 確保拿到3句有效詩句
+  const validQuotes=[];
+  for(const q of shuffledQuotes){
+    const p=splitQuote(q);
+    if(p.first&&p.second&&p.first.length>0&&p.second.length>0){
+      validQuotes.push({quote:q,first:p.first,second:p.second});
+      if(validQuotes.length>=3) break;
+    }
+  }
+  
+  if(validQuotes.length<3) return [];
+  
+  // 第一句：選擇下一句
+  const q1=validQuotes[0];
+  const ws1=shuffle(allQuotes.map(x=>splitQuote(x).second).filter(x=>x&&x!==q1.second)).slice(0,4);
+  const o1=shuffle([q1.second,...ws1]);
+  
+  // 第二句：填空題
+  const q2=validQuotes[1];
+  const kw=extractKeyword(q2.quote)||q2.first;
+  const bq=q2.quote.replace(kw,'______');
+  
+  // 第三句：選擇上一句
+  const q3=validQuotes[2];
+  const ws2=shuffle(allQuotes.map(x=>splitQuote(x).first).filter(x=>x&&x!==q3.first)).slice(0,4);
+  const o2=shuffle([q3.first,...ws2]);
+  
+  return [
+    {id:'cn1',type:'choice',subject:'chinese',question:`請選出「${q1.first}」的下一句`,options:o1,answer:o1.indexOf(q1.second),hint:`完整名句：${q1.quote}`,fullQuote:q1.quote},
+    {id:'cn2',type:'fill',subject:'chinese',question:`請填入空格中的正確內容：${bq}`,answer:kw,acceptBoth:true,hint:`完整名句：${q2.quote}`,fullQuote:q2.quote},
+    {id:'cn3',type:'choice',subject:'chinese',question:`請選出「${q3.second}」的上一句`,options:o2,answer:o2.indexOf(q3.first),hint:`完整名句：${q3.quote}`,fullQuote:q3.quote}
+  ];
+}
+
+function genMath(){
+  // 使用真正隨機數，每次練習都不同
+  // 隨機選擇3道選擇題（從擴充後的題庫）
+  const choiceIndices = shuffle([...Array(MATH_CHOICE.length).keys()]);
+  const i1 = choiceIndices[0];
+  const i2 = choiceIndices[1];
+  const i3 = choiceIndices[2];
+  
+  // 隨機選擇2道填空題
+  const fillIndices = shuffle([...Array(MATH_FILL.length).keys()]);
+  const f1 = fillIndices[0];
+  const f2 = fillIndices[1];
+  
+  return [
+    {id:'mt1',type:'choice',subject:'math',question:MATH_CHOICE[i1].q,options:MATH_CHOICE[i1].opts,answer:MATH_CHOICE[i1].ans,hint:MATH_CHOICE[i1].hint},
+    {id:'mt2',type:'choice',subject:'math',question:MATH_CHOICE[i2].q,options:MATH_CHOICE[i2].opts,answer:MATH_CHOICE[i2].ans,hint:MATH_CHOICE[i2].hint},
+    {id:'mt3',type:'choice',subject:'math',question:MATH_CHOICE[i3].q,options:MATH_CHOICE[i3].opts,answer:MATH_CHOICE[i3].ans,hint:MATH_CHOICE[i3].hint},
+    {id:'mt4',type:'fill',subject:'math',question:MATH_FILL[f1].q,answer:MATH_FILL[f1].ans,hint:MATH_FILL[f1].hint},
+    {id:'mt5',type:'fill',subject:'math',question:MATH_FILL[f2].q,answer:MATH_FILL[f2].ans,hint:MATH_FILL[f2].hint}
+  ];
+}
+
+function genEnglish(){
+  // 使用真正隨機數，每次練習都不同
+  const bank=ENGLISH_BANK;
+  const shuffledBank=shuffle([...bank]);
+  const selected=shuffledBank.slice(0,3);
+  
+  return selected.map((q,i)=>{
+    if(q.opts) return {id:'en'+(i+1),type:'choice',subject:'english',question:q.q,options:q.opts,answer:q.ans,hint:q.hint,alts:q.alts};
+    else return {id:'en'+(i+1),type:'fill',subject:'english',question:q.q,answer:q.ans,acceptBoth:q.type==='fill_cn',hint:q.hint,alts:q.alts};
+  });
+}
+
+// ============================================================
+// 渲染
+// ============================================================
+function render(){
+  const app=document.getElementById('app');
+  if(state.page==='home') renderHome(app);
+  else if(state.page==='quiz') renderQuiz(app);
+  else if(state.page==='result') renderResult(app);
+  else if(state.page==='wrong') renderWrongAnswers(app);
+}
+
+function renderHome(app){
+  const subjects=[
+    {id:'chinese',name:'中文',icon:'📖',color:'bg-duo-orange',shadow:'shadow-duo-orange',desc:'古詩文名句',gradient:'from-orange-400 to-red-500',bg:'bg-orange-50'},
+    {id:'math',name:'數學',icon:'📐',color:'bg-duo-green',shadow:'shadow-duo-green',desc:'高中數學',gradient:'from-green-400 to-emerald-500',bg:'bg-green-50'},
+    {id:'english',name:'英文',icon:'🔤',color:'bg-duo-blue',shadow:'shadow-duo-blue',desc:'B2-C1 詞彙',gradient:'from-blue-400 to-indigo-500',bg:'bg-blue-50'}
+  ];
+  
+  // 檢查每個科目是否已完成
+  const done=state.completedToday||{};
+  const completedCount=Object.keys(done).length;
+  const allCompleted=completedCount>=3;
+  
+  app.innerHTML=`
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col page-enter">
+      <!-- 頂部狀態欄 -->
+      <div class="w-full max-w-3xl mx-auto px-6 pt-8 pb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <span class="text-3xl">⚡</span>
+            </div>
+            <div>
+              <h1 class="text-2xl font-black text-gray-800">Edu<span class="text-green-500">Spark</span></h1>
+              <p class="text-xs text-gray-400 font-medium">每日學習平台</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <!-- 連續天數 -->
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+              <span class="text-2xl">🔥</span>
+              <span class="font-black text-xl text-orange-500">${state.streak}</span>
+              <span class="text-xs text-gray-400">天</span>
+            </div>
+            <!-- 深色/淺色模式切換 -->
+            <button onclick="toggleDarkMode()" class="theme-toggle flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md hover:shadow-lg">
+              ${state.darkMode?'<span class="text-xl">☀️</span><span class="font-bold text-yellow-500">明亮</span>':'<span class="text-xl">🌙</span><span class="font-bold text-indigo-600">深色</span>'}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 主內容區域 - 放大比例 -->
+      <div class="flex-1 flex items-center justify-center px-8 py-6">
+        <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden">
+          <!-- 每日任務標題 -->
+          <div class="bg-gradient-to-r from-green-400 to-emerald-500 px-10 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <span class="text-4xl">🎯</span>
+              <h2 class="text-white font-black text-2xl">每日任務</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              ${[0,1,2].map(i=>`
+                <div class="w-10 h-10 rounded-full flex items-center justify-center ${done[subjects[i].id]?'bg-white':'bg-white/30'} shadow-lg transition-all text-lg">
+                  ${done[subjects[i].id]?'<span class="text-green-500 font-black">✓</span>':'<span class="text-white/70 font-bold">'+(i+1)+'</span>'}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <!-- 進度條 -->
+          <div class="px-10 py-5 bg-gray-50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-gray-500 font-semibold text-base">完成進度</span>
+              <span class="text-green-500 font-bold text-lg">${state.dailyProgress}%</span>
+            </div>
+            <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-500" style="width:${state.dailyProgress}%"></div>
+            </div>
+          </div>
+          
+          <!-- 三科目卡片 - 放大 -->
+          <div class="flex items-center justify-around py-8 px-6">
+            ${subjects.map((s,i)=>{
+              const yOff=i%2===0?'-translate-y-3':'translate-y-3';
+              const isDone=done[s.id];
+              const wrongCount=getWrongAnswersBySubject(s.id).length;
+              return `
+              <div class="flex flex-col items-center ${yOff} transition-transform hover:scale-105">
+                <button onclick="startSubject('${s.id}')" 
+                  class="relative w-40 h-40 ${s.color} ${s.shadow} rounded-3xl flex flex-col items-center justify-center subject-btn hover:scale-105 transition-all duration-300 ${isDone?'opacity-70':''}">
+                  ${isDone?'<div class="absolute -top-2 -right-2 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-bounce z-10">✓</div>':''}
+                  <div class="w-16 h-16 bg-white/25 rounded-xl flex items-center justify-center mb-2">
+                    <span class="text-4xl">${s.icon}</span>
+                  </div>
+                  <span class="text-white font-black text-xl drop-shadow-lg">${s.name}</span>
+                </button>
+                <div class="mt-3 text-center">
+                  <p class="text-gray-700 font-bold text-sm">${s.desc}</p>
+                  ${isDone?'<p class="text-green-500 font-extrabold text-xs mt-1">✓ 已完成</p>':'<p class="text-gray-400 font-medium text-xs mt-1">點擊開始</p>'}
+                </div>
+                <!-- 錯題分析按鈕 -->
+                <button onclick="showWrongAnswers('${s.id}')" 
+                  class="mt-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 font-medium text-xs transition-all flex items-center gap-1 ${wrongCount>0?'ring-2 ring-red-400 animate-pulse':''}">
+                  <span>📝</span>
+                  <span>錯題分析</span>
+                  ${wrongCount>0?`<span class="bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs font-bold">${wrongCount}</span>`:''}
+                </button>
+              </div>
+              `;
+            }).join('')}
+          </div>
+          
+          <!-- 底部裝飾 -->
+          <div class="px-10 pb-8">
+            ${allCompleted?`
+              <div class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl px-8 py-5 flex items-center justify-center gap-4 animate-pulse">
+                <span class="text-4xl">🎉</span>
+                <div>
+                  <p class="text-orange-500 font-black text-xl">恭喜！今日任務全部完成！</p>
+                  <p class="text-gray-500 text-sm">明天再來挑戰更多題目吧～</p>
+                </div>
+              </div>
+            `:`
+              <div class="text-center text-gray-400 font-medium text-base py-4">
+                三題練習 · 自由學習 · 隨時隨地
+              </div>
+            `}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.startSubject=function(id){
+  let qs=[];
+  if(id==='chinese') qs=genChinese();
+  else if(id==='math') qs=genMath();
+  else if(id==='english') qs=genEnglish();
+  if(qs.length>0){
+    state.subject=id;state.questions=qs;state.currentQ=0;state.results=[];state.page='quiz';
+    render();
+  }
+};
+
+function renderQuiz(app){
+  const q=state.questions[state.currentQ];
+  if(!q){state.page='home';render();return;}
+  const total=state.questions.length;
+  const ci=state.currentQ;
+  const names={chinese:'中文',math:'數學',english:'英文'};
+  const colors={chinese:'text-duo-orange',math:'text-duo-green',english:'text-duo-blue'};
+  const progress=Math.round((ci/total)*100);
+  const dots=state.questions.map((_,i)=>{
+    let c='bg-gray-100';
+    if(i<ci) c=state.results[i]?'bg-duo-green':'bg-duo-red';
+    else if(i===ci) c='bg-white';
+    return `<div class="w-2.5 h-2.5 rounded-full ${c}"></div>`;
+  }).join('');
+
+  let qContent='';
+  if(q.type==='choice'){
+    const labels='ABCDE';
+    qContent=q.options.map((opt,i)=>{
+      return `<button onclick="selectChoice(${i})" class="choice-btn w-full text-left p-4 rounded-duo font-nunito font-semibold text-base bg-white border-2 border-gray-200 hover:border-duo-blue text-primary mb-3 shadow-sm hover:shadow-md">
+        <span class="mr-2 opacity-60">${labels[i]}.</span><span class="math-opt">${opt}</span>
+      </button>`;
+    }).join('');
+  } else {
+    qContent=`<div class="flex gap-3">
+      <input type="text" id="fillInput" placeholder="輸入你的答案..." 
+        class="flex-1 bg-white text-primary font-nunito font-semibold text-lg p-4 rounded-duo border-2 border-gray-200 focus:border-duo-blue outline-none shadow-sm"
+        onkeydown="if(event.key==='Enter')submitFill()">
+      <button onclick="submitFill()" class="bg-duo-green text-white font-nunito font-bold px-6 rounded-duo shadow-duo-green active:translate-y-[1px] active:shadow-none transition-all">提交</button>
+    </div>`;
+  }
+
+  app.innerHTML=`
+    <div class="min-h-screen bg-white flex flex-col px-4 py-6 page-enter">
+      <div class="flex items-center gap-4 mb-6">
+        <button onclick="goHome()" class="text-secondary hover:text-duo-blue font-nunito font-bold text-sm transition-colors">← 返回</button>
+        <h1 class="font-nunito font-black text-xl ${colors[state.subject]}">${names[state.subject]}</h1>
+        <div class="flex-1"></div>
+        <!-- 深色模式快捷切換 -->
+        <button onclick="toggleDarkMode()" class="theme-toggle w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors" title="${state.darkMode?'切換到明亮模式':'切換到深色模式'}">
+          ${state.darkMode?'<span class="text-base">☀️</span>':'<span class="text-base">🌙</span>'}
+        </button>
+        <div class="flex items-center gap-1">${dots}</div>
+      </div>
+      <div class="flex items-center gap-2 mb-6">
+        <div class="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-duo-green rounded-full progress-fill" style="width:${progress}%"></div>
+        </div>
+        <span class="text-secondary font-nunito font-bold text-sm">${ci+1}/${total}</span>
+      </div>
+      <div class="w-full max-w-lg mx-auto">
+        <div class="bg-white rounded-duo-lg p-6 mb-4 shadow-md">
+          <h2 class="text-primary font-nunito font-bold text-xl mb-5 leading-relaxed math-q">${q.question}</h2>
+          <div id="optionsArea">${qContent}</div>
+          <div class="mt-4">
+            <button onclick="toggleHint()" class="flex items-center gap-2 text-duo-blue hover:text-duo-blue-dark font-nunito font-semibold text-sm transition-colors">
+              <span>💡</span><span id="hintLabel">提示 (Hint)</span>
+            </button>
+            <div id="hintContent" class="hint-content mt-2 px-3 bg-blue-50 rounded-duo text-primary font-nunito text-sm leading-relaxed border-l-4 border-duo-blue">
+              <span class="hint-text">${q.hint}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="feedbackBar" class="feedback-bar fixed bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-between bg-duo-green">
+      <div class="flex items-center gap-3 text-primary font-nunito font-bold text-lg">
+        <span class="text-3xl" id="fbEmoji">✅</span>
+        <span id="fbMsg">答對了！太棒了！</span>
+      </div>
+      <button onclick="nextQuestion()" class="bg-duo-green text-white font-nunito font-bold px-5 py-2 rounded-duo shadow-duo-green active:translate-y-[1px] active:shadow-none transition-all">繼續</button>
+    </div>`;
+
+  // 渲染 KaTeX 數學公式
+  setTimeout(()=>{
+    const container = document.getElementById('optionsArea');
+    if(container) renderAllMath(container);
+    document.querySelectorAll('.math-q').forEach(el => {
+      if(el.dataset.mathRendered !== 'true') {
+        renderMathInElement(el);
+        el.dataset.mathRendered = 'true';
+      }
+    });
+    document.querySelectorAll('.hint-text').forEach(el => {
+      if(el.dataset.mathRendered !== 'true') {
+        renderMathInElement(el);
+        el.dataset.mathRendered = 'true';
+      }
+    });
+  },50);
+}
+
+window.toggleHint=function(){
+  const c=document.getElementById('hintContent');
+  const l=document.getElementById('hintLabel');
+  if(c.classList.contains('show')){c.classList.remove('show');l.textContent='提示 (Hint)';}
+  else{c.classList.add('show');l.textContent='隱藏提示';}
+};
+
+window.selectChoice=function(idx){
+  const q=state.questions[state.currentQ];
+  const correct=idx===q.answer;
+  state.results.push(correct);
+  // 記錄錯題（包含完整信息）
+  if(!correct) recordWrongAnswer(
+    q.question, 
+    q.options[idx], 
+    q.options[q.answer], 
+    state.subject,
+    q.options,     // 選項列表
+    q.hint,        // 提示/解題思路
+    q.fullQuote,   // 完整引用
+    q.type,        // 題目類型
+    q.alts,        // 備選答案
+    idx            // 用戶選擇的索引
+  );
+  // 如果是複習模式答對，移除該錯題
+  if(correct && q.id && q.id.startsWith('retry') && q.originalQuestion) {
+    removeWrongAnswer(q.question, state.subject);
+  }
+  showFeedback(correct,q);
+  // 更新按鈕樣式
+  const btns=document.querySelectorAll('.choice-btn');
+  btns.forEach((btn,i)=>{
+    btn.disabled=true;
+    btn.classList.remove('hover:border-duo-blue');
+    if(i===q.answer) btn.className='choice-btn w-full text-left p-4 rounded-duo font-nunito font-semibold text-base bg-duo-green border-2 border-duo-green text-white mb-3 shadow-duo-green';
+    else if(i===idx&&!correct) btn.className='choice-btn w-full text-left p-4 rounded-duo font-nunito font-semibold text-base bg-duo-red border-2 border-duo-red text-white mb-3 shadow-duo-red';
+    else btn.className='choice-btn w-full text-left p-4 rounded-duo font-nunito font-semibold text-base bg-gray-50 border-2 border-transparent text-secondary mb-3';
+  });
+};
+
+window.submitFill=function(){
+  const input=document.getElementById('fillInput');
+  if(!input||!input.value.trim()) return;
+  const q=state.questions[state.currentQ];
+  let correct=checkMatch(input.value,q.answer);
+  let matchedAlt=-1;
+  if(!correct&&q.alts) {
+    matchedAlt=q.alts.findIndex(a=>checkMatch(input.value,a));
+    if(matchedAlt>=0) correct=true;
+  }
+  state.results.push(correct);
+  // 記錄錯題（包含完整信息）
+  if(!correct) recordWrongAnswer(
+    q.question, 
+    input.value, 
+    q.answer, 
+    state.subject,
+    null,         // 填空題沒有選項
+    q.hint,       // 提示/解題思路
+    q.fullQuote,  // 完整引用
+    q.type,       // 題目類型
+    q.alts,       // 備選答案
+    matchedAlt    // 匹配到的備選索引，-1表示都沒匹配
+  );
+  // 如果是複習模式答對，移除該錯題
+  if(correct && q.id && q.id.startsWith('retry') && q.originalQuestion) {
+    removeWrongAnswer(q.question, state.subject);
+  }
+  input.disabled=true;
+  input.classList.add(correct?'border-duo-green':'border-duo-red');
+  if(!correct){
+    const hint=document.createElement('p');
+    hint.className='text-duo-red font-nunito text-sm mt-2';
+    hint.textContent='正確答案：'+q.answer;
+    input.parentElement.parentElement.appendChild(hint);
+  }
+  const submitBtn=input.parentElement.querySelector('button');
+  if(submitBtn) submitBtn.disabled=true;
+  showFeedback(correct,q);
+};
+
+function showFeedback(correct,q){
+  const fb=document.getElementById('feedbackBar');
+  fb.className=`feedback-bar fixed bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-between ${correct?'bg-duo-green':'bg-duo-red'}`;
+  document.getElementById('fbEmoji').textContent=correct?'✅':'❌';
+  document.getElementById('fbMsg').textContent=correct?'答對了！太棒了！':'答錯了，再接再厲！';
+  setTimeout(()=>fb.classList.add('show'),50);
+}
+
+window.nextQuestion=function(){
+  const fb=document.getElementById('feedbackBar');
+  fb.classList.remove('show');
+  setTimeout(()=>{
+    if(state.currentQ+1>=state.questions.length){
+      state.page='result';render();
+    } else {
+      state.currentQ++;render();
+    }
+  },300);
+};
+
+window.goHome=function(){state.page='home';state.subject=null;state.questions=[];render();};
+
+function renderResult(app){
+  const correct=state.results.filter(Boolean).length;
+  const total=state.results.length;
+  const pct=Math.round(correct/total*100);
+  const xp=correct*10+(pct>=80?20:0);
+  let emoji='📚',msg='加油！複習一下吧！';
+  if(pct===100){emoji='🏆';msg='完美！全部答對！';}
+  else if(pct>=67){emoji='🎉';msg='做得好！繼續加油！';}
+  else if(pct>=33){emoji='💪';msg='不錯的嘗試，再接再厲！';}
+  const names={chinese:'中文',math:'數學',english:'英文'};
+  const strokeColor=pct>=67?'#58CC02':pct>=33?'#FF9600':'#FF4B4B';
+  const offset=314*(1-pct/100);
+
+  addXP(xp);
+  saveCompletion(state.subject);
+
+  app.innerHTML=`
+    <div class="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-6 page-enter">
+      <!-- 頂部工具欄 -->
+      <div class="absolute top-4 right-4">
+        <button onclick="toggleDarkMode()" class="theme-toggle w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-all" title="${state.darkMode?'切換到明亮模式':'切換到深色模式'}">
+          ${state.darkMode?'<span class="text-lg">☀️</span>':'<span class="text-lg">🌙</span>'}
+        </button>
+      </div>
+      <div class="text-center">
+        <div class="text-8xl mb-6">${emoji}</div>
+        <h1 class="text-primary font-nunito font-black text-3xl mb-2">${names[state.subject]} 練習完成！</h1>
+        <p class="text-secondary font-nunito font-semibold text-lg mb-8">${msg}</p>
+        <div class="relative w-40 h-40 mx-auto mb-8">
+          <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#E5E5E5" stroke-width="10"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="${strokeColor}" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="314" stroke-dashoffset="${offset}" style="transition:stroke-dashoffset 1.5s ease-out"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-primary font-nunito font-black text-4xl">${pct}%</span>
+            <span class="text-secondary font-nunito text-xs">${correct}/${total} 正確</span>
+          </div>
+        </div>
+        <div class="bg-white rounded-duo-lg p-4 mb-8 inline-block shadow-md">
+          <span class="text-duo-gold font-nunito font-black text-2xl">+${xp} XP</span>
+          ${pct>=80?'<span class="text-duo-green font-nunito text-sm ml-2">(含高準確率獎勵)</span>':''}
+        </div>
+        <br>
+        <button onclick="finishQuiz()" class="bg-duo-green text-white font-nunito font-black text-lg px-10 py-4 rounded-duo shadow-duo-green active:translate-y-[2px] active:shadow-none transition-all subject-btn">
+          繼續學習
+        </button>
+      </div>
+    </div>`;
+}
+
+window.finishQuiz=function(){state.page='home';state.subject=null;state.questions=[];render();};
+
+// 顯示錯題分析
+window.showWrongAnswers=function(subject){
+  state.page='wrong';
+  state.wrongSubject=subject;
+  render();
+};
+
+// 再做一次錯題
+window.retryWrongQuestions=function(subject){
+  const wrongList=getWrongAnswersBySubject(subject);
+  if(wrongList.length===0) return;
+  
+  // 從錯題列表生成題目
+  const questions=wrongList.map((w,i)=>({
+    id:'retry'+(i+1),
+    type:w.type||'choice',
+    subject:subject,
+    question:w.question,
+    options:w.options||null,
+    answer:w.answer,
+    hint:w.hint||'',
+    fullQuote:w.fullQuote||'',
+    alts:w.alts||null,
+    originalQuestion:w.question  // 保存原始題目用於移除錯題
+  }));
+  
+  state.subject=subject;
+  state.questions=questions;
+  state.currentQ=0;
+  state.results=[];
+  state.page='quiz';
+  render();
+};
+
+function renderWrongAnswers(app){
+  const subject=state.wrongSubject;
+  const names={chinese:'中文',math:'數學',english:'英文'};
+  const colors={chinese:'bg-duo-orange',math:'bg-duo-green',english:'bg-duo-blue'};
+  const iconMap={chinese:'📖',math:'📐',english:'🔤'};
+  const wrongList=getWrongAnswersBySubject(subject);
+  
+  // 根據科目生成解題思路HTML
+  const generateSolution=(w)=>{
+    if(subject==='math'){
+      return `
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">📐</span>
+            <span class="font-bold text-green-700">解題思路</span>
+          </div>
+          <div class="text-gray-700 text-sm leading-relaxed solution-hint math-hint">${w.hint||'本題考查數學概念與計算能力'}</div>
+        </div>
+        ${w.fullQuote?`
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+          <p class="text-xs text-blue-500 font-medium mb-1">答題關鍵</p>
+          <p class="text-blue-700 text-sm">${w.fullQuote}</p>
+        </div>`:''}
+      `;
+    } else if(subject==='chinese'){
+      const tip = generateMemoryTip(w.fullQuote || w.question);
+      return `
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">📜</span>
+            <span class="font-bold text-orange-700">名句解讀</span>
+          </div>
+          <p class="text-gray-700 text-sm leading-relaxed mb-2">${w.hint||'理解古詩文的意境與情感'}</p>
+          ${w.fullQuote?`
+          <div class="bg-white/60 rounded-lg p-3 mt-2 border-l-4 border-orange-400">
+            <p class="text-orange-700 font-bold text-base hint-text leading-relaxed">「${w.fullQuote}」</p>
+          </div>
+          `:''}
+        </div>
+        
+        <!-- 🎬 視覺化記憶 -->
+        <div class="memory-card bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-3">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">🎬</span>
+            <span class="font-bold text-blue-700 text-sm">視覺化想像</span>
+          </div>
+          <p class="text-gray-700 text-sm leading-relaxed">${tip.visual}</p>
+        </div>
+
+        <!-- 🔄 對比聯想 -->
+        <div class="memory-card bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 mb-3">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">🔄</span>
+            <span class="font-bold text-emerald-700 text-sm">對比 & 聯想</span>
+          </div>
+          <p class="text-gray-700 text-sm leading-relaxed">${tip.compare}</p>
+        </div>
+
+        ${tip.scene?`
+        <div class="memory-card bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl p-4 mb-3">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">🎭</span>
+            <span class="font-bold text-purple-700 text-sm">情境演繹</span>
+          </div>
+          <p class="text-gray-700 text-sm leading-relaxed">${tip.scene}</p>
+        </div>`:''}
+
+        <!-- 🔑 記憶關鍵字 -->
+        <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 rounded-xl p-3">
+          <div class="flex items-center gap-2">
+            <span class="text-yellow-600">🔑</span>
+            <span class="text-xs text-yellow-600 font-bold">快速記憶口訣</span>
+          </div>
+          <p class="text-yellow-800 font-medium text-sm mt-1">${tip.keyword}</p>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">🔤</span>
+            <span class="font-bold text-blue-700">詞彙詳解</span>
+          </div>
+          <div class="text-gray-700 text-sm leading-relaxed">${w.hint||'掌握單詞的詞根詞綴和應用場景'}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-green-50 border border-green-200 rounded-xl p-3">
+            <p class="text-xs text-green-500 font-medium mb-1">正確答案</p>
+            <p class="text-green-700 font-bold">${w.correctAnswer}</p>
+          </div>
+          <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p class="text-xs text-red-500 font-medium mb-1">你的答案</p>
+            <p class="text-red-700 font-bold">${w.userAnswer}</p>
+          </div>
+        </div>
+      `;
+    }
+  };
+  
+  app.innerHTML=`
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col page-enter">
+      <!-- 頂部導航 -->
+      <div class="w-full max-w-2xl mx-auto px-6 pt-8 pb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <button onclick="state.page='home';render();" class="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+              <span class="text-xl">←</span>
+            </button>
+            <!-- 深色模式切換 -->
+            <button onclick="toggleDarkMode()" class="theme-toggle w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg" title="${state.darkMode?'切換到明亮模式':'切換到深色模式'}">
+              ${state.darkMode?'<span class="text-sm">☀️</span>':'<span class="text-sm">🌙</span>'}
+            </button>
+          </div>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 ${colors[subject]} rounded-xl flex items-center justify-center shadow-md">
+                <span class="text-2xl">${iconMap[subject]}</span>
+              </div>
+              <div>
+                <h1 class="text-xl font-black text-gray-800">${names[subject]} 錯題分析</h1>
+                <p class="text-xs text-gray-400">共 ${wrongList.length} 題待複習</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 操作按鈕 -->
+      ${wrongList.length>0?`
+      <div class="w-full max-w-2xl mx-auto px-6 pb-4">
+        <div class="flex gap-3">
+          <button onclick="retryWrongQuestions('${subject}')" 
+            class="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+            <span class="text-xl">🔄</span>
+            <span>再做一次 (${wrongList.length}題)</span>
+          </button>
+          <button onclick="clearWrongAnswers('${subject}');state.page='home';render();" 
+            class="px-6 py-3 bg-white text-gray-600 font-semibold rounded-xl shadow-md hover:bg-gray-50 transition-all">
+            一鍵清除
+          </button>
+        </div>
+      </div>
+      `:''}
+      
+      <!-- 錯題列表 -->
+      <div class="flex-1 px-6 pb-6">
+        <div class="w-full max-w-2xl mx-auto">
+          ${wrongList.length===0?`
+            <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+              <span class="text-6xl mb-4 block">🎉</span>
+              <h2 class="text-xl font-black text-gray-800 mb-2">太棒了！</h2>
+              <p class="text-gray-500 mb-6">這個科目目前沒有錯題，繼續保持！</p>
+              <button onclick="state.page='home';render();" class="bg-green-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-green-600 transition-all">
+                返回首頁
+              </button>
+            </div>
+          `:` 
+            <div class="space-y-4">
+              ${wrongList.map((w,i)=>`
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                  <!-- 題目區 -->
+                  <div class="p-5 border-b border-gray-100">
+                    <div class="flex items-center gap-3 mb-3">
+                      <div class="w-8 h-8 ${colors[subject]} rounded-full flex items-center justify-center shrink-0">
+                        <span class="text-white font-bold text-sm">${i+1}</span>
+                      </div>
+                      <span class="text-xs text-gray-400">錯題回顧</span>
+                    </div>
+                    <h3 class="text-gray-800 font-bold text-base mb-2 leading-relaxed math-q">${w.question}</h3>
+                    ${w.options?`
+                    <div class="space-y-2 mt-3">
+                      ${w.options.map((opt,oi)=>`
+                        <div class="flex items-center gap-2 p-2 rounded-lg ${oi===w.answer?'bg-green-50 border border-green-300':'${oi===w.userAnswerIndex?"bg-red-50 border border-red-300":"bg-gray-50 border border-transparent"}'}">
+                          <span class="text-sm font-medium ${oi===w.answer?'text-green-600':'text-gray-500'}">${String.fromCharCode(65+oi)}.</span>
+                          <span class="text-sm math-opt ${oi===w.answer?'font-bold text-green-700':'text-gray-600'}">${opt}</span>
+                          ${oi===w.answer?'<span class="ml-auto text-green-500 text-sm">✓ 正確</span>':''}
+                          ${oi===w.userAnswerIndex&&oi!==w.answer?'<span class="ml-auto text-red-500 text-sm">✗ 你的答案</span>':''}
+                        </div>
+                      `).join('')}
+                    </div>
+                    `:`<div class="bg-gray-50 rounded-lg p-3">
+                      <p class="text-xs text-gray-400 mb-1">你的答案</p>
+                      <p class="text-red-600 font-semibold">${w.userAnswer}</p>
+                    </div>`}
+                  </div>
+                  
+                  <!-- 解題思路區 -->
+                  <div class="p-5 bg-gray-50/50">
+                    ${generateSolution(w)}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <!-- 底部操作 -->
+            <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="text-2xl">💡</span>
+                <h3 class="text-gray-800 font-black text-lg">學習建議</h3>
+              </div>
+              <ul class="space-y-2 text-gray-600 text-sm">
+                <li class="flex items-start gap-2">
+                  <span class="text-green-500 mt-0.5">✓</span>
+                  <span>仔細閱讀解題思路，理解每個步驟</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-500 mt-0.5">✓</span>
+                  <span>點擊「再做一次」檢驗學習成果</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-500 mt-0.5">✓</span>
+                  <span>答對後錯題會自動從列表移除</span>
+                </li>
+              </ul>
+            </div>
+          `}
+        </div>
+      </div>
+    </div>`;
+  
+  // 渲染數學公式 - 增強版
+  setTimeout(()=>{
+    const container = document.querySelector('.min-h-screen');
+    if(container) renderAllMath(container);
+  },100);
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+loadState();
+initDarkMode();
+render();
+</script>
+</body>
+</html>
